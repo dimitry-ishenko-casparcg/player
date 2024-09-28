@@ -5,6 +5,8 @@
 // Distributed under the GNU GPL license. See the LICENSE.md file for details.
 
 ////////////////////////////////////////////////////////////////////////////////
+#include "amcp.hpp"
+
 #include <asio.hpp>
 #include <exception>
 #include <filesystem>
@@ -49,6 +51,9 @@ try
 
     std::cout << "Reading settings" << std::endl;
     auto sett = read_setting();
+
+    std::cout << "Connecting to " << sett.server << std::endl;
+    amcp::connection control{io, sett.server};
     //
 
     io.run();
