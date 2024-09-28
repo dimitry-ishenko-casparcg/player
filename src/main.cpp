@@ -6,6 +6,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 #include "amcp.hpp"
+#include "osc.hpp"
 
 #include <asio.hpp>
 #include <exception>
@@ -54,6 +55,10 @@ try
 
     std::cout << "Connecting to " << sett.server << std::endl;
     amcp::connection control{io, sett.server};
+
+    std::cout << "Subscribing to OSC" << std::endl;
+    osc::connection monitor{io};
+    control.osc_enable(monitor.port());
     //
 
     io.run();
