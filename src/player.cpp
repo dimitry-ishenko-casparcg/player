@@ -7,8 +7,21 @@
 ////////////////////////////////////////////////////////////////////////////////
 #include <asio.hpp>
 #include <exception>
+#include <filesystem>
 #include <iostream>
 #include <pgm/args.hpp>
+#include <vector>
+
+namespace fs = std::filesystem;
+
+////////////////////////////////////////////////////////////////////////////////
+struct settings
+{
+    std::string server = "localhost:5250";
+    std::vector<fs::path> files;
+};
+
+settings read_setting();
 
 ////////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
@@ -34,6 +47,8 @@ try
 
     asio::io_context io;
 
+    std::cout << "Reading settings" << std::endl;
+    auto sett = read_setting();
     //
 
     io.run();
@@ -43,4 +58,11 @@ catch(const std::exception& e)
 {
     std::cerr << e.what() << std::endl;
     return 1;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+settings read_setting()
+{
+    // TODO: read settings from settings.ini
+    return settings{};
 }
