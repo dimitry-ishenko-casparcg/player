@@ -10,7 +10,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 add_definitions(-DASIO_STANDALONE -DASIO_NO_DEPRECATED)
 add_definitions(-DVERSION="${PROJECT_VERSION}")
 
-add_executable(${PROJECT_NAME} src/amcp.hpp src/main.cpp)
+add_executable(${PROJECT_NAME} src/amcp.hpp src/main.cpp src/osc.hpp)
 
 include(GNUInstallDirs)
 install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_BINDIR})
