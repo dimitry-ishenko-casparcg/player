@@ -13,7 +13,7 @@ add_definitions(-DVERSION="${PROJECT_VERSION}")
 add_executable(${PROJECT_NAME}
     src/amcp.cpp
     src/amcp.hpp
-    src/player.cpp
+    src/main.cpp
 )
 
 include(GNUInstallDirs)
