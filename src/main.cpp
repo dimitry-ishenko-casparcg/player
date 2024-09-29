@@ -99,7 +99,7 @@ public:
         reset();
 
         std::cout << "Subscribing to OSC" << std::endl;
-        control_.osc_enable(monitor_.port());
+        control_.osc_subscribe(monitor_.port());
 
         std::cout << "Starting playback" << std::endl;
         load_next();

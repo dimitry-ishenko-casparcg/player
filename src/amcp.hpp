@@ -47,8 +47,7 @@ public:
         asio::connect(socket_, remote);
     }
 
-    void osc_enable (int port) { async_send("OSC SUBSCRIBE "   + q(port)); }
-    void osc_disable(int port) { async_send("OSC UNSUBSCRIBE " + q(port)); }
+    void osc_subscribe(int port) { async_send("OSC SUBSCRIBE " + q(port)); }
 
     void clear(int chan) { async_send("CLEAR " + q(chan)); }
 
