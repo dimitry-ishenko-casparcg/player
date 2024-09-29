@@ -11,6 +11,7 @@ add_definitions(-DASIO_STANDALONE -DASIO_NO_DEPRECATED)
 add_definitions(-DVERSION="${PROJECT_VERSION}")
 
 add_executable(${PROJECT_NAME} src/amcp.hpp src/main.cpp src/osc.hpp)
+target_link_libraries(${PROJECT_NAME} osc++)
 
 include(GNUInstallDirs)
 install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_BINDIR})
