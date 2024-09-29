@@ -9,6 +9,7 @@
 #include "osc.hpp"
 
 #include <asio.hpp>
+#include <deque>
 #include <exception>
 #include <filesystem>
 #include <iostream>
@@ -22,6 +23,9 @@ namespace fs = std::filesystem;
 struct settings
 {
     std::string server = "localhost:5250";
+    int channel = 1;
+    int layer = 0;
+
     std::vector<fs::path> files;
 };
 
@@ -32,6 +36,7 @@ class player
 {
     amcp::connection control_;
     osc::connection monitor_;
+    std::deque<std::string> paths_;
 
     osc::address_space space_;
 
@@ -47,10 +52,32 @@ class player
         return osc::connection{io};
     }
 
+    void load_next()
+    {
+        //
+    }
+
 public:
     player(asio::io_context& io, const settings& settings) :
         control_{get_control(io, settings.server)}, monitor_{get_monitor(io)}
     {
+        auto address = "/channel/" + std::to_string(settings.channel) + "/stage/layer/" + std::to_string(settings.layer) + "/foreground/file/path";
+        space_.add(address, [&](osc::message msg)
+        {
+            if (msg.values().are<std::string>())
+            {
+                std::string path;
+                msg >> path;
+                if (path == paths_.front()) load_next();
+            }
+        });
+
+        monitor_.on_packet_recv([&](osc::packet packet)
+        {
+            try { space_.dispatch(packet.parse()); }
+            catch(...) { } // discard invalid packets
+        });
+
         std::cout << "Subscribing to OSC" << std::endl;
         control_.osc_enable(monitor_.port());
     }
