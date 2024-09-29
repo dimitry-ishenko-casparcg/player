@@ -11,13 +11,10 @@
 #include <asio.hpp>
 #include <deque>
 #include <exception>
-#include <filesystem>
 #include <iostream>
 #include <osc++.hpp>
 #include <pgm/args.hpp>
-#include <vector>
-
-namespace fs = std::filesystem;
+#include <string>
 
 ////////////////////////////////////////////////////////////////////////////////
 struct settings
@@ -26,7 +23,7 @@ struct settings
     int channel = 1;
     int layer = 0;
 
-    std::vector<fs::path> files;
+    std::deque<std::string> paths;
 };
 
 settings read_setting();
@@ -36,7 +33,7 @@ class player
 {
     amcp::connection control_;
     osc::connection monitor_;
-    std::deque<std::string> paths_;
+    settings settings_;
 
     osc::address_space space_;
 
@@ -58,8 +55,8 @@ class player
     }
 
 public:
-    player(asio::io_context& io, const settings& settings) :
-        control_{get_control(io, settings.server)}, monitor_{get_monitor(io)}
+    player(asio::io_context& io, settings settings) :
+        control_{get_control(io, settings.server)}, monitor_{get_monitor(io)}, settings_{std::move(settings)}
     {
         auto address = "/channel/" + std::to_string(settings.channel) + "/stage/layer/" + std::to_string(settings.layer) + "/foreground/file/path";
         space_.add(address, [&](osc::message msg)
@@ -68,7 +65,7 @@ public:
             {
                 std::string path;
                 msg >> path;
-                if (path == paths_.front()) load_next();
+                if (path == settings_.paths.front()) load_next();
             }
         });
 
@@ -111,7 +108,7 @@ try
     auto settings = read_setting();
 
     std::cout << "Creating player" << std::endl;
-    player player{io, settings};
+    player player{io, std::move(settings)};
     //
 
     io.run();
