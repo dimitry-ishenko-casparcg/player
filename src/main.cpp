@@ -26,9 +26,6 @@ struct settings
     std::deque<std::string> paths;
 };
 
-settings read_setting();
-
-////////////////////////////////////////////////////////////////////////////////
 class player
 {
     amcp::connection control_;
@@ -122,11 +119,9 @@ try
         return 0;
     }
 
+    settings settings;
+
     asio::io_context io;
-
-    std::cout << "Reading settings" << std::endl;
-    auto settings = read_setting();
-
     player player{io, std::move(settings)};
 
     io.run();
@@ -136,11 +131,4 @@ catch(const std::exception& e)
 {
     std::cerr << e.what() << std::endl;
     return 1;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-settings read_setting()
-{
-    // TODO: read settings from settings.ini
-    return settings{};
 }
