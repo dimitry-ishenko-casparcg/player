@@ -11,9 +11,11 @@
 #include "types.hpp"
 
 #include <asio.hpp>
+#include <optional>
 #include <stdexcept>
 #include <string>
 #include <system_error>
+#include <vector>
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace amcp
@@ -47,6 +49,22 @@ public:
 
     void osc_enable (int port) { async_send("OSC SUBSCRIBE "   + q(port)); }
     void osc_disable(int port) { async_send("OSC UNSUBSCRIBE " + q(port)); }
+
+    void clear(int chan) { async_send("CLEAR " + q(chan)); }
+
+    void mixer(int chan, int layer, const std::string& cmd, const std::vector<double>& args)
+    {
+        std::string sas;
+        for (auto&& arg : args) sas += ' ' + q(arg);
+        async_send("MIXER " + q(chan, layer) + ' ' + cmd + sas);
+    }
+
+    void loadbg(int chan, int layer, const std::string& path, std::optional<int> len = {})
+    {
+        std::string sol;
+        if (len) sol = " LENGTH " + q(*len);
+        async_send("LOADBG " + q(chan, layer) + ' ' + q(path) + sol + " MIX 30 AUTO FIT");
+    }
 };
 
 }
