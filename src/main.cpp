@@ -21,8 +21,7 @@
 struct settings
 {
     std::string server = "localhost:5250";
-    int channel = 1;
-    int layer = 0;
+    int chan = 1, layer = 0;
 
     std::deque<std::string> paths;
 };
@@ -34,7 +33,7 @@ class player
 {
     amcp::connection control_;
     osc::connection monitor_;
-    settings settings_;
+    settings sett_;
 
     osc::address_space space_;
     bool ready_ = true;
@@ -51,31 +50,24 @@ class player
         return osc::connection{io};
     }
 
-    void reset()
-    {
-        control_.clear(settings_.channel);
-        control_.mixer(settings_.channel, settings_.layer, "ANCHOR", { .5, .5 });
-        control_.mixer(settings_.channel, settings_.layer, "FILL", { .5, .5, 1, 1 });
-    }
-
     void load_next()
     {
-        if (settings_.paths.size())
+        if (sett_.paths.size())
         {
-            std::cout << "Loading " << settings_.paths.front() << std::endl;
-            control_.loadbg(settings_.channel, settings_.layer, settings_.paths.front());
+            std::cout << "Loading " << sett_.paths.front() << std::endl;
+            control_.loadbg(sett_.chan, sett_.layer, sett_.paths.front());
 
-            settings_.paths.emplace_back( std::move(settings_.paths.front()) );
-            settings_.paths.pop_front();
+            sett_.paths.emplace_back( std::move(sett_.paths.front()) );
+            sett_.paths.pop_front();
         }
         else ready_ = false;
     }
 
 public:
-    player(asio::io_context& io, settings settings) :
-        control_{get_control(io, settings.server)}, monitor_{get_monitor(io)}, settings_{std::move(settings)}
+    player(asio::io_context& io, settings sett) :
+        control_{get_control(io, sett.server)}, monitor_{get_monitor(io)}, sett_{std::move(sett)}
     {
-        auto address = "/channel/" + q(settings_.channel) + "/stage/layer/" + q(settings_.layer) + "/background/producer";
+        auto address = "/channel/" + q(sett_.chan) + "/stage/layer/" + q(sett_.layer) + "/background/producer";
         space_.add(address, [&](osc::message msg)
         {
             if (msg.value(0).to_string() == "empty")
@@ -96,7 +88,9 @@ public:
         });
 
         std::cout << "Resetting channel" << std::endl;
-        reset();
+        control_.clear(sett_.chan);
+        control_.mixer(sett_.chan, sett_.layer, "ANCHOR", { .5, .5 });
+        control_.mixer(sett_.chan, sett_.layer, "FILL", { .5, .5, 1, 1 });
 
         std::cout << "Subscribing to OSC" << std::endl;
         control_.osc_subscribe(monitor_.port());
