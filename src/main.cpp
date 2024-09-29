@@ -12,6 +12,7 @@
 #include <exception>
 #include <filesystem>
 #include <iostream>
+#include <osc++.hpp>
 #include <pgm/args.hpp>
 #include <vector>
 
@@ -25,6 +26,35 @@ struct settings
 };
 
 settings read_setting();
+
+////////////////////////////////////////////////////////////////////////////////
+class player
+{
+    amcp::connection control_;
+    osc::connection monitor_;
+
+    osc::address_space space_;
+
+    auto get_control(asio::io_context& io, const std::string& server)
+    {
+        std::cout << "Connecting to " << server << std::endl;
+        return amcp::connection{io, server};
+    }
+
+    auto get_monitor(asio::io_context& io)
+    {
+        std::cout << "Setting up OSC connection" << std::endl;
+        return osc::connection{io};
+    }
+
+public:
+    player(asio::io_context& io, const settings& settings) :
+        control_{get_control(io, settings.server)}, monitor_{get_monitor(io)}
+    {
+        std::cout << "Subscribing to OSC" << std::endl;
+        control_.osc_enable(monitor_.port());
+    }
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
@@ -51,14 +81,10 @@ try
     asio::io_context io;
 
     std::cout << "Reading settings" << std::endl;
-    auto sett = read_setting();
+    auto settings = read_setting();
 
-    std::cout << "Connecting to " << sett.server << std::endl;
-    amcp::connection control{io, sett.server};
-
-    std::cout << "Subscribing to OSC" << std::endl;
-    osc::connection monitor{io};
-    control.osc_enable(monitor.port());
+    std::cout << "Creating player" << std::endl;
+    player player{io, settings};
     //
 
     io.run();
