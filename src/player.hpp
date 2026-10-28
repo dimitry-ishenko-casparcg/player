@@ -24,7 +24,7 @@ class player
     {
         fs::path path;
         enum { audio, image, video } type;
-        std::optional<msec> duration;
+        std::optional<msec> len;
     };
 
     std::vector<entry> media_;
