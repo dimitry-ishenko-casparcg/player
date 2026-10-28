@@ -5,6 +5,9 @@
 // Distributed under the GNU GPL license. See the LICENSE.md file for details.
 
 ////////////////////////////////////////////////////////////////////////////////
+#include "player.hpp"
+#include "settings.hpp"
+
 #include <exception>
 #include <filesystem>
 #include <pgm/args.hpp>
@@ -48,7 +51,10 @@ try
     else if (ep) std::rethrow_exception(ep);
 
     ////////////////////
-    // TODO
+    settings data{ args["path"].value() };
+
+    player player{data};
+    player.run();
 
     return 0;
 }
