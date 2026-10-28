@@ -7,12 +7,19 @@
 ////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
+#include <chrono>
 #include <filesystem>
+
 namespace fs = std::filesystem;
+using msec = std::chrono::milliseconds;
+
+using namespace std::chrono_literals;
 
 ////////////////////////////////////////////////////////////////////////////////
 struct settings
 {
     fs::path path;
+
+    msec image_len = 10s;
     bool loop = true;
 };
