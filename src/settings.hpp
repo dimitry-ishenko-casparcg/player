@@ -19,6 +19,7 @@ using namespace std::chrono_literals;
 struct settings
 {
     fs::path media_path;
+    fs::path server_path = "casparcg-server";
 
     msec image_len = 10s;
     bool loop = true;
