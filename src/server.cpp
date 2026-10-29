@@ -33,8 +33,7 @@ server::server(uv::loop& loop, const settings& data)
     file.exceptions(std::ios_base::failbit | std::ios_base::badbit);
     file.open(config_path);
 
-    auto config = std::format(R"(
-<?xml version="1.0" encoding="utf-8"?>
+    auto config = std::format(R"(<?xml version="1.0" encoding="utf-8"?>
 <configuration>
     <paths>
         <media-path>{0}</media-path>
