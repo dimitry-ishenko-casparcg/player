@@ -27,10 +27,11 @@ class player
         std::optional<msec> len;
     };
 
+    settings data_;
     std::vector<entry> media_;
 
 public:
-    explicit player(const settings&);
+    explicit player(settings);
 
     void run();
 };

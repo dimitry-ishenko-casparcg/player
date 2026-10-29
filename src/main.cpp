@@ -13,6 +13,7 @@
 #include <pgm/args.hpp>
 #include <print>
 #include <string>
+#include <utility>
 
 namespace fs = std::filesystem;
 
@@ -53,7 +54,7 @@ try
     ////////////////////
     settings data{ args["path"].value() };
 
-    player player{data};
+    player player{ std::move(data) };
     player.run();
 
     return 0;
