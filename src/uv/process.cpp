@@ -5,6 +5,7 @@
 // Distributed under the GNU GPL license. See the LICENSE.md file for details.
 
 ////////////////////////////////////////////////////////////////////////////////
+#include "error.hpp"
 #include "process.hpp"
 
 #include <array>
