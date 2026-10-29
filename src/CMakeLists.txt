@@ -15,6 +15,7 @@ add_definitions(-DVERSION="${PROJECT_VERSION}")
 add_executable(player
     main.cpp
     player.cpp
+    server.cpp
     uv/process.cpp
 )
 target_link_libraries(player PRIVATE pgm::args PkgConfig::libuv)
