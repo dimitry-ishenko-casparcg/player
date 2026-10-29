@@ -10,8 +10,10 @@
 #include "handle.hpp"
 #include "loop.hpp"
 
+#include <concepts>
 #include <functional>
 #include <memory>
+#include <span>
 
 #include <uv.h>
 
@@ -29,6 +31,34 @@ public:
 
 private:
     std::unique_ptr<signal_callback> cb_ = std::make_unique<signal_callback>();
+};
+
+////////////////////////////////////////////////////////////////////////////////
+class signals
+{
+public:
+    using signal_callback = uv::signal::signal_callback;
+
+    template<std::convertible_to<int>... Vs>
+    signals(loop& loop, Vs... nums)
+    {
+        signals_.reserve(sizeof...(Vs));
+        (signals_.emplace_back(loop, nums), ...);
+    }
+
+    signals(loop& loop, std::span<const int> nums)
+    {
+        signals_.reserve(nums.size());
+        for (int num : nums) signals_.emplace_back(loop, num);
+    }
+
+    void on_signal(const signal_callback& cb)
+    {
+        for (auto& s : signals_) s.on_signal(cb);
+    }
+
+private:
+    std::vector<signal> signals_;
 };
 
 }
