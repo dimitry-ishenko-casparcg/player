@@ -9,7 +9,7 @@
 
 #include "error.hpp"
 
-#include <exception>
+#include <exception> // std::terminate
 #include <memory>
 
 #include <uv.h>
@@ -37,7 +37,7 @@ public:
 private:
     static uv_loop_t* create()
     {
-        // create with standard delete in ase uv_loop_init() fails
+        // create with standard deleter in case uv_loop_init() fails
         auto p = std::make_unique<uv_loop_t>();
         if (auto rc = uv_loop_init(p.get()); rc < 0) throw error{rc, "uv_loop_init"};
         return p.release();
