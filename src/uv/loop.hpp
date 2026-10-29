@@ -32,7 +32,9 @@ class loop
 {
 public:
     uv_loop_t* get() noexcept { return p_.get(); }
+
     bool run(uv_run_mode mode = UV_RUN_DEFAULT) { return uv_run(get(), mode); }
+    void stop() noexcept { uv_stop(get()); }
 
 private:
     static uv_loop_t* create()
