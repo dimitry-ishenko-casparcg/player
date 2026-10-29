@@ -29,6 +29,7 @@ class process : public handle<uv_process_t>
 public:
     using exit_callback = std::function<void(int status, int signal)>;
 
+    process() = default;
     process(loop&, std::vector<std::string> args, std::vector<std::string> env = {});
 
     void on_exit(exit_callback cb) { *exit_cb_ = std::move(cb); }
