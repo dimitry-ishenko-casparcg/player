@@ -12,7 +12,11 @@ pkg_check_modules(libuv REQUIRED IMPORTED_TARGET libuv)
 
 add_definitions(-DVERSION="${PROJECT_VERSION}")
 
-add_executable(player main.cpp player.cpp)
+add_executable(player
+    main.cpp
+    player.cpp
+    uv/process.cpp
+)
 target_link_libraries(player PRIVATE pgm::args PkgConfig::libuv)
 
 include(GNUInstallDirs)
