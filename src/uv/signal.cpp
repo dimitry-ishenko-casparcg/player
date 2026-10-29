@@ -11,17 +11,17 @@
 namespace uv
 {
 
-signal::signal(loop& loop, int signal)
+signal::signal(loop& loop, int num)
 {
     init([&](uv_signal_t* h){ return uv_signal_init(loop.get(), h); }, "uv_signal_init");
 
     get()->data = cb_.get();
-    auto fn = [](uv_signal_t* h, int signal)
+    auto fn = [](uv_signal_t* h, int num)
     {
         auto& cb = *static_cast<signal_callback*>(h->data);
-        if (cb) cb(signal);
+        if (cb) cb(num);
     };
-    if (int rc = uv_signal_start(get(), fn, signal); rc < 0) throw error{rc, "uv_signal_start"};
+    if (int rc = uv_signal_start(get(), fn, num); rc < 0) throw error{rc, "uv_signal_start"};
 }
 
 }

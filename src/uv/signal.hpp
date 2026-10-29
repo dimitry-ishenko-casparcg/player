@@ -24,7 +24,7 @@ class signal : public handle<uv_signal_t>
 public:
     using signal_callback = std::function<void(int signal)>;
 
-    signal(loop&, int signal);
+    signal(loop&, int num);
     void on_signal(signal_callback cb) { *cb_ = std::move(cb); }
 
 private:
