@@ -18,7 +18,7 @@ using namespace std::chrono_literals;
 ////////////////////////////////////////////////////////////////////////////////
 struct settings
 {
-    fs::path path;
+    fs::path media_path;
 
     msec image_len = 10s;
     bool loop = true;

@@ -86,14 +86,14 @@ player::player(const settings& data)
         else if (verbose) std::print("[player] ignoring '{}'\n", path.string());
     };
 
-    if (fs::is_directory(data.path))
+    if (fs::is_directory(data.media_path))
     {
-        fs::recursive_directory_iterator iter{ data.path,
+        fs::recursive_directory_iterator iter{ data.media_path,
             fs::directory_options::follow_directory_symlink | fs::directory_options::skip_permission_denied
         };
         for (auto&& entry : iter) add_media(entry.path(), false);
     }
-    else add_media(data.path, true);
+    else add_media(data.media_path, true);
 
     if (media_.empty()) throw std::invalid_argument{"[player] nothing to play!"};
 
