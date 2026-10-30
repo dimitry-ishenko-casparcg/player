@@ -34,7 +34,7 @@ public:
     void on_exit(exit_callback cb) { *exit_cb_ = std::move(cb); }
 
     ////////////////////
-    int pid() noexcept { return get()->pid; }
+    int pid() const noexcept { return get()->pid; }
 
     int signal(int n) noexcept { return uv_process_kill(get(), n); }
     int terminate() noexcept { return signal(SIGTERM); }
