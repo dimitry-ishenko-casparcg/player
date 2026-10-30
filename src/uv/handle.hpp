@@ -33,6 +33,7 @@ class handle
 {
 public:
     V* get() noexcept { return p_.get(); }
+    const V* get() const noexcept { return p_.get(); }
 
 protected:
     void init(auto&& fn, const char* name)
