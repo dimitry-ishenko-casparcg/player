@@ -36,7 +36,7 @@ server::server(uv::loop& loop, const settings& data) : osc_{loop}
     file.exceptions(std::ios_base::failbit | std::ios_base::badbit);
     file.open(config_path);
 
-    auto config = std::format(R"(<?xml version="1.0" encoding="utf-8"?>
+    constexpr auto tmpl = R"(<?xml version="1.0" encoding="utf-8"?>
 <configuration>
     <paths>
         <media-path>{0}</media-path>
@@ -68,7 +68,8 @@ server::server(uv::loop& loop, const settings& data) : osc_{loop}
       </predefined-clients>
     </osc>
 </configuration>
-)", config_dir_.string(), osc_.local().port());
+)";
+    auto config = std::format(tmpl, config_dir_.string(), osc_.local().port());
 
     file.write(config.data(), config.size());
     file.close();
