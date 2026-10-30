@@ -21,7 +21,7 @@ signal::signal(loop& loop, int num)
         auto& cb = *static_cast<signal_callback*>(h->data);
         if (cb) cb(num);
     };
-    if (int rc = uv_signal_start(get(), fn, num); rc < 0) throw error{rc, "uv_signal_start"};
+    if (auto rc = uv_signal_start(get(), fn, num); rc < 0) throw error{rc, "uv_signal_start"};
 }
 
 }
