@@ -18,6 +18,7 @@ add_executable(player
     server.cpp
     uv/process.cpp
     uv/signal.cpp
+    uv/udp.cpp
 )
 target_link_libraries(player PRIVATE pgm::args PkgConfig::libuv)
 
