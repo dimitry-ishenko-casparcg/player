@@ -12,26 +12,30 @@
 #include "uv/process.hpp"
 #include "uv/udp.hpp"
 
+#include <functional>
 #include <osc++.hpp>
 
 ////////////////////////////////////////////////////////////////////////////////
 class server
 {
 public:
-    using exit_callback = uv::process::exit_callback;
-
     server(uv::loop&, const settings&);
     ~server();
 
-    void on_exit(exit_callback cb) { exit_cb_ = std::move(cb); }
+    void stop() noexcept { proc_.terminate(); }
+
+    enum state { starting, idle, playing, stopping };
+    using state_change_callback = std::function<void(state)>;
+    void on_state_changed(state_change_callback cb) { cb_ = std::move(cb); }
 
 private:
-    exit_callback exit_cb_;
-
     fs::path config_dir_;
 
     uv::udp osc_;
     osc::address_space space_;
 
     uv::process proc_;
+
+    state_change_callback cb_;
+    state state_ = starting;
 };

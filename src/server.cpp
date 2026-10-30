@@ -84,10 +84,14 @@ server::server(uv::loop& loop, const settings& data) : osc_{loop}
     file.write(config.data(), config.size());
     file.close();
 
-    std::print("[server] running with config:\n{}\n", config);
+    std::print("[server] starting CasparCG Server with:\n{}\n", config);
 
     proc_ = uv::process{loop, { data.server_path, config_path.string() }};
-    proc_.on_exit([this](int status, int signal){ if (exit_cb_) exit_cb_(status, signal); });
+    proc_.on_exit([this](int status, int signal)
+    {
+        std::print("[server] CasparCG Server exited: status={} signal={}\n", status, signal);
+        if (cb_) cb_(state_ = stopping);
+    });
 }
 
 server::~server()
