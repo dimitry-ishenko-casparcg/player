@@ -12,8 +12,6 @@
 #include "uv/process.hpp"
 #include "uv/udp.hpp"
 
-#include <memory>
-
 ////////////////////////////////////////////////////////////////////////////////
 class server
 {
@@ -23,13 +21,10 @@ public:
     server(uv::loop&, const settings&);
     ~server();
 
-    server(server&&) noexcept = default;
-    server& operator=(server&&) noexcept = default;
-
-    void on_exit(exit_callback cb) { *exit_cb_ = std::move(cb); }
+    void on_exit(exit_callback cb) { exit_cb_ = std::move(cb); }
 
 private:
-    std::unique_ptr<exit_callback> exit_cb_ = std::make_unique<exit_callback>();
+    exit_callback exit_cb_;
 
     fs::path config_dir_;
     uv::udp osc_;

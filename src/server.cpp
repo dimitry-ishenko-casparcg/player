@@ -80,7 +80,7 @@ server::server(uv::loop& loop, const settings& data) : osc_{loop}
     std::print("[server] running with config:\n{}\n", config);
 
     proc_ = uv::process{loop, { data.server_path, config_path.string() }};
-    proc_.on_exit([cb = exit_cb_.get()](int status, int signal){ if (*cb) (*cb)(status, signal); });
+    proc_.on_exit([this](int status, int signal){ if (exit_cb_) exit_cb_(status, signal); });
 }
 
 server::~server()
