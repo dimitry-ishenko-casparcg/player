@@ -44,6 +44,9 @@ server::server(uv::loop& loop, const settings& data) : osc_{loop}
         <data-path>{0}</data-path>
         <template-path>{0}</template-path>
     </paths>
+    <html>
+        <cache-path>{0}/cef</cache-path>
+    </html>
     <channels>
         <channel>
             <video-mode>1080p5994</video-mode>
