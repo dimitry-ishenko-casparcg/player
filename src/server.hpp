@@ -12,6 +12,8 @@
 #include "uv/process.hpp"
 #include "uv/udp.hpp"
 
+#include <osc++.hpp>
+
 ////////////////////////////////////////////////////////////////////////////////
 class server
 {
@@ -27,6 +29,9 @@ private:
     exit_callback exit_cb_;
 
     fs::path config_dir_;
+
     uv::udp osc_;
+    osc::address_space space_;
+
     uv::process proc_;
 };

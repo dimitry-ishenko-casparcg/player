@@ -18,6 +18,13 @@
 server::server(uv::loop& loop, const settings& data) : osc_{loop}
 {
     osc_.bind({ "127.0.0.1", 0 });
+    osc_.on_recv([this](std::string_view data, const uv::address&)
+    {
+        osc::packet packet{ data.data(), static_cast<osc::int32>(data.size()) };
+
+        try { space_.dispatch(packet.parse()); }
+        catch (...) { } // discard invalid
+    });
 
     std::print("[server] generating config\n");
 

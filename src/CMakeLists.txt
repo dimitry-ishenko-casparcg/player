@@ -10,6 +10,8 @@ find_package(pgm_args REQUIRED)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(libuv REQUIRED IMPORTED_TARGET libuv)
 
+find_package(osc++ REQUIRED)
+
 add_definitions(-DVERSION="${PROJECT_VERSION}")
 
 add_executable(player
@@ -20,7 +22,7 @@ add_executable(player
     uv/signal.cpp
     uv/udp.cpp
 )
-target_link_libraries(player PRIVATE pgm::args PkgConfig::libuv)
+target_link_libraries(player PRIVATE pgm::args osc++::osc++_static PkgConfig::libuv)
 
 include(GNUInstallDirs)
 install(TARGETS ${name} DESTINATION ${CMAKE_INSTALL_BINDIR})
