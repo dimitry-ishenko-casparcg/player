@@ -6,6 +6,9 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 #include "player.hpp"
+#include "server.hpp"
+#include "uv/loop.hpp"
+#include "uv/signal.hpp"
 
 #include <algorithm> // std::ranges::lexicographical_compare
 #include <cctype> // std::tolower
@@ -103,5 +106,27 @@ player::player(settings data) : data_{std::move(data)}
 
 void player::run()
 {
-    // TODO
+    uv::loop loop;
+    server server{loop, data_};
+
+    uv::signals sigset{loop, SIGINT, SIGTERM};
+    sigset.on_signal([&](int num){ server.stop(); });
+
+    server.on_state_changed([&](server::state state)
+    {
+        switch (state)
+        {
+        case server::idle:
+            // TODO
+            break;
+
+        case server::stopping:
+            loop.stop();
+            break;
+
+        default:;
+        }
+    });
+
+    loop.run();
 }
