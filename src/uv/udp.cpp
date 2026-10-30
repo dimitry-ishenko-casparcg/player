@@ -25,6 +25,17 @@ void udp::bind(const address& addr)
     if (rc < 0) throw error{rc, "uv_udp_bind"};
 }
 
+address udp::local() const
+{
+    address addr;
+    int len = sizeof(addr.addr_);
+
+    auto rc = uv_udp_getsockname(get(), addr.get(), &len);
+    if (rc < 0) throw error{rc, "uv_udp_getsockname"};
+
+    return addr;
+}
+
 void udp::connect(const address& peer)
 {
     auto rc = uv_udp_connect(get(), peer.get());

@@ -30,6 +30,8 @@ public:
     explicit udp(loop&);
 
     void bind(const address&);
+    address local() const;
+
     void connect(const address&);
     void disconnect();
 
