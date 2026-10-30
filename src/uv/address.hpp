@@ -43,12 +43,13 @@ public:
 private:
     friend class udp;
 
-    explicit address(const sockaddr& addr) noexcept
+    explicit address(const sockaddr* addr) noexcept
     {
-        if (addr.sa_family == AF_INET) std::memcpy(&addr_, &addr, sizeof(addr_));
+        if (addr->sa_family == AF_INET) std::memcpy(&addr_, addr, sizeof(addr_));
     }
 
-    auto& get() const noexcept { return reinterpret_cast<const sockaddr&>(addr_); }
+    auto get() const noexcept { return reinterpret_cast<const sockaddr*>(&addr_); }
+    auto get() noexcept { return reinterpret_cast<sockaddr*>(&addr_); }
 };
 
 }

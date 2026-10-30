@@ -21,13 +21,13 @@ udp::udp(loop& loop)
 
 void udp::bind(const address& addr)
 {
-    auto rc = uv_udp_bind(get(), &addr.get(), 0);
+    auto rc = uv_udp_bind(get(), addr.get(), 0);
     if (rc < 0) throw error{rc, "uv_udp_bind"};
 }
 
 void udp::connect(const address& peer)
 {
-    auto rc = uv_udp_connect(get(), &peer.get());
+    auto rc = uv_udp_connect(get(), peer.get());
     if (rc < 0) throw error{rc, "uv_udp_connect"};
 }
 
@@ -50,7 +50,7 @@ void udp::on_recv(recv_callback cb)
     {
         auto& s = *static_cast<state*>(h->data);
         if (n < 0 || !from) return;
-        if (s.cb) s.cb(std::string_view{b->base, static_cast<std::size_t>(n)}, address{*from});
+        if (s.cb) s.cb({ b->base, static_cast<std::size_t>(n) }, address{from});
     };
 
     auto rc = uv_udp_recv_start(get(), alloc, recv);

@@ -35,7 +35,7 @@ public:
 
     void on_recv(recv_callback);
 
-    void send(std::string data, const address& to) { send(std::move(data), &to.get()); }
+    void send(std::string data, const address& to) { send(std::move(data), to.get()); }
     void send(std::string data) { send(std::move(data), nullptr); }
 
 private:
