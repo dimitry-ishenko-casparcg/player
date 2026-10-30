@@ -116,7 +116,7 @@ void player::run()
     {
         switch (state)
         {
-        case server::idle:
+        case server::ready:
             // TODO
             break;
 
