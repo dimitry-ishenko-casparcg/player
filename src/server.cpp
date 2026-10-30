@@ -6,6 +6,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 #include "server.hpp"
+#include "uv/address.hpp"
 
 #include <format>
 #include <fstream>
@@ -14,8 +15,10 @@
 #include <utility>
 
 ////////////////////////////////////////////////////////////////////////////////
-server::server(uv::loop& loop, const settings& data)
+server::server(uv::loop& loop, const settings& data) : osc_{loop}
 {
+    osc_.bind({ "127.0.0.1", 0 });
+
     std::print("[server] generating config\n");
 
     std::random_device rd;
@@ -60,12 +63,12 @@ server::server(uv::loop& loop, const settings& data)
       <predefined-clients>
         <predefined-client>
           <address>127.0.0.1</address>
-          <port>6250</port>
+          <port>{1}</port>
         </predefined-client>
       </predefined-clients>
     </osc>
 </configuration>
-)", config_dir_.string());
+)", config_dir_.string(), osc_.local().port());
 
     file.write(config.data(), config.size());
     file.close();

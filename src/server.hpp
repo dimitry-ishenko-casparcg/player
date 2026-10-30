@@ -10,6 +10,7 @@
 #include "settings.hpp"
 #include "uv/loop.hpp"
 #include "uv/process.hpp"
+#include "uv/udp.hpp"
 
 #include <memory>
 
@@ -31,5 +32,6 @@ private:
     std::unique_ptr<exit_callback> exit_cb_ = std::make_unique<exit_callback>();
 
     fs::path config_dir_;
+    uv::udp osc_;
     uv::process proc_;
 };
