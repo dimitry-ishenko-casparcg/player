@@ -90,7 +90,8 @@ server::server(uv::loop& loop, const settings& data) : osc_{loop}
     proc_.on_exit([this](int status, int signal)
     {
         std::print("[server] CasparCG Server exited: status={} signal={}\n", status, signal);
-        if (cb_) cb_(state_ = stopping);
+        state_ = stopping;
+        if (cb_) cb_(state_);
     });
 }
 
