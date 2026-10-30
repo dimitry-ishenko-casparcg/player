@@ -11,8 +11,9 @@
 #include <format>
 #include <fstream>
 #include <print>
-#include <random>
 #include <utility>
+
+#include <uv.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 server::server(uv::loop& loop, const settings& data) : osc_{loop}
@@ -28,10 +29,8 @@ server::server(uv::loop& loop, const settings& data) : osc_{loop}
 
     std::print("[server] generating config\n");
 
-    std::random_device rd;
-    std::mt19937_64 gen{rd()};
-
-    auto tmpdir = fs::temp_directory_path() / ("player-" + std::to_string(gen()));
+    auto pid = uv_os_getpid();
+    auto tmpdir = fs::temp_directory_path() / ("player-" + std::to_string(pid));
     fs::create_directories(tmpdir);
 
     std::print("[server] created temp dir: '{}'\n", tmpdir.string());
