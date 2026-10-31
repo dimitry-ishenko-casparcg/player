@@ -102,6 +102,15 @@ server::server(uv::loop& loop, const settings& data) : osc_{loop}
     });
 }
 
+void server::set_state(state new_state)
+{
+    if (new_state != state_)
+    {
+        state_ = new_state;
+        if (cb_) cb_(state_);
+    }
+}
+
 server::~server()
 {
     if (!config_dir_.empty())

@@ -39,6 +39,7 @@ private:
 
     state_change_callback cb_;
     state state_ = starting;
+    void set_state(state);
 
     std::optional<double> fps_;
 };
