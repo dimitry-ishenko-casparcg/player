@@ -76,9 +76,9 @@ void udp::send(std::string data, const sockaddr* to)
     req->payload = std::move(data);
 
     auto buf = uv_buf_init(req->payload.data(), req->payload.size());
-    auto send = [](uv_udp_send_t* s, int){ delete static_cast<request*>(s); };
+    auto cb = [](uv_udp_send_t* s, int){ delete static_cast<request*>(s); };
 
-    auto rc = uv_udp_send(req.get(), get(), &buf, 1, to, send);
+    auto rc = uv_udp_send(req.get(), get(), &buf, 1, to, cb);
     if (rc < 0) throw error{rc, "uv_udp_send"};
 
     (void)req.release(); // freed inside send()
