@@ -14,6 +14,7 @@
 #include <functional>
 #include <memory>
 #include <span>
+#include <vector>
 
 #include <uv.h>
 
