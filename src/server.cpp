@@ -19,7 +19,7 @@
 server::server(uv::loop& loop, const settings& data) : osc_{loop}
 {
     osc_.bind({ "127.0.0.1", 0 });
-    osc_.on_recv([this](std::string_view data, const uv::address&)
+    osc_.on_recv([&](std::string_view data, const uv::address&)
     {
         osc::packet packet{ data.data(), static_cast<osc::int32>(data.size()) };
 
@@ -86,7 +86,7 @@ server::server(uv::loop& loop, const settings& data) : osc_{loop}
     std::print("[server] starting CasparCG Server with:\n{}\n", config);
 
     proc_ = uv::process{loop, { data.server_path, config_path.string() }};
-    proc_.on_exit([this](int status, int signal)
+    proc_.on_exit([&](int status, int signal)
     {
         std::print("[server] CasparCG Server exited: status={} signal={}\n", status, signal);
         state_ = stopping;
