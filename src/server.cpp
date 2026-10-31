@@ -27,6 +27,14 @@ server::server(uv::loop& loop, const settings& data) : osc_{loop}
         catch (...) { } // discard invalid
     });
 
+    space_.add("/channel/1/framerate", [&](auto& msg)
+    {
+        if (!fps_)
+        {
+            fps_ = (double)msg.value(0).to_int32() / msg.value(1).to_int32();
+            std::print("[server] framerate = {:.2f}hz\n", *fps_);
+        }
+    });
     std::print("[server] generating config\n");
 
     auto pid = uv_os_getpid();

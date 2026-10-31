@@ -13,6 +13,7 @@
 #include "uv/udp.hpp"
 
 #include <functional>
+#include <optional>
 #include <osc++.hpp>
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -38,4 +39,6 @@ private:
 
     state_change_callback cb_;
     state state_ = starting;
+
+    std::optional<double> fps_;
 };
