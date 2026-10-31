@@ -35,6 +35,12 @@ server::server(uv::loop& loop, const settings& data) : osc_{loop}
             std::print("[server] framerate = {:.2f}hz\n", *fps_);
         }
     });
+    space_.add("/channel/1/stage/layer/0/background/producer", [&](auto& msg)
+    {
+        if (state_ == stopping || !fps_) return;
+        set_state(msg.value(0).to_string() == "empty" ? ready : loaded);
+    });
+
     std::print("[server] generating config\n");
 
     auto pid = uv_os_getpid();
