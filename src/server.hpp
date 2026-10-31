@@ -42,4 +42,5 @@ private:
     void set_state(state);
 
     std::optional<double> fps_;
+    int watch_ = 0;
 };

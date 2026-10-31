@@ -34,6 +34,11 @@ server::server(uv::loop& loop, const settings& data) : osc_{loop}
             fps_ = (double)msg.value(0).to_int32() / msg.value(1).to_int32();
             std::print("[server] framerate = {:.2f}hz\n", *fps_);
         }
+        if (++watch_ > 10) set_state(stopping);
+    });
+    space_.add("/channel/1/output/port/.*/consumer", [&](auto& msg)
+    {
+        if (msg.value(0).to_string() == "screen") watch_ = 0;
     });
     space_.add("/channel/1/stage/layer/0/background/producer", [&](auto& msg)
     {
