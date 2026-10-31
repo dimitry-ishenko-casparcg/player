@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include "settings.hpp"
+#include "types.hpp"
 #include "uv/loop.hpp"
 #include "uv/process.hpp"
 #include "uv/udp.hpp"

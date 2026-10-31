@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include "settings.hpp"
+#include "types.hpp"
 
 #include <chrono>
 #include <filesystem>

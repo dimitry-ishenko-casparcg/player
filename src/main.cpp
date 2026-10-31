@@ -6,7 +6,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 #include "player.hpp"
-#include "settings.hpp"
+#include "types.hpp"
 
 #include <exception>
 #include <filesystem>
