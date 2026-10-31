@@ -9,6 +9,7 @@
 
 #include "handle.hpp"
 #include "loop.hpp"
+#include "pipe.hpp"
 
 #include <csignal>
 #include <functional>
@@ -34,6 +35,8 @@ public:
     void on_exit(exit_callback cb) { *exit_cb_ = std::move(cb); }
 
     ////////////////////
+    void write(std::string data) { stdin_.write(std::move(data)); }
+
     int pid() const noexcept { return get()->pid; }
 
     int signal(int n) noexcept { return uv_process_kill(get(), n); }
@@ -42,6 +45,7 @@ public:
 
 private:
     std::unique_ptr<exit_callback> exit_cb_ = std::make_unique<exit_callback>();
+    pipe stdin_, stdout_, stderr_;
 };
 
 }

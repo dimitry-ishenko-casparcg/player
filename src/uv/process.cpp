@@ -8,13 +8,21 @@
 #include "error.hpp"
 #include "process.hpp"
 
-#include <array>
-
 ////////////////////////////////////////////////////////////////////////////////
+namespace
+{
+
+constexpr auto operator|(uv_stdio_flags x, uv_stdio_flags y) {
+    return static_cast<uv_stdio_flags>(static_cast<int>(x) | static_cast<int>(y));
+}
+
+}
+
 namespace uv
 {
 
-process::process(loop& loop, std::vector<std::string> args, std::vector<std::string> env)
+process::process(loop& loop, std::vector<std::string> args, std::vector<std::string> env) :
+    stdin_{loop}, stdout_{loop}, stderr_{loop}
 {
     std::vector<char*> argv;
     for (auto& r : args) argv.push_back(r.data());
@@ -24,19 +32,22 @@ process::process(loop& loop, std::vector<std::string> args, std::vector<std::str
     for (auto& e : env) envp.push_back(e.data());
     envp.push_back(nullptr);
 
-    std::array<uv_stdio_container_t, 3> io{};
-    for (int fd = 0; fd < io.size(); ++fd)
-    {
-        io[fd].flags = UV_INHERIT_FD;
-        io[fd].data.fd = fd;
-    }
+    uv_stdio_container_t io[3] = {};
+    io[0].flags = UV_CREATE_PIPE | UV_READABLE_PIPE;
+    io[0].data.stream = reinterpret_cast<uv_stream_t*>(stdin_.get());
+
+    io[1].flags = UV_IGNORE; // TODO
+    io[1].data.stream = reinterpret_cast<uv_stream_t*>(stdout_.get());
+
+    io[2].flags = UV_IGNORE; // TODO
+    io[2].data.stream = reinterpret_cast<uv_stream_t*>(stderr_.get());
 
     uv_process_options_t opts{};
     opts.file  = argv.at(0);
     opts.args  = argv.data();
     opts.env   = env.empty() ? nullptr : envp.data();
-    opts.stdio = io.data();
-    opts.stdio_count = io.size();
+    opts.stdio = io;
+    opts.stdio_count = std::size(io);
     opts.exit_cb = [](uv_process_t* p, auto status, auto signal)
     {
         auto& cb = *static_cast<exit_callback*>(p->data);
