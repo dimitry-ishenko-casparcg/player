@@ -9,6 +9,7 @@
 
 #include <chrono>
 #include <filesystem>
+#include <optional>
 
 namespace fs = std::filesystem;
 using msec = std::chrono::milliseconds;
@@ -16,6 +17,13 @@ using msec = std::chrono::milliseconds;
 using namespace std::chrono_literals;
 
 ////////////////////////////////////////////////////////////////////////////////
+struct entry
+{
+    fs::path path;
+    enum { audio, image, video } type;
+    std::optional<msec> len;
+};
+
 struct settings
 {
     fs::path media_path;

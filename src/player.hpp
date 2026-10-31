@@ -8,25 +8,11 @@
 #pragma once
 
 #include "types.hpp"
-
-#include <chrono>
-#include <filesystem>
-#include <optional>
 #include <vector>
-
-namespace fs = std::filesystem;
-using msec = std::chrono::milliseconds;
 
 ////////////////////////////////////////////////////////////////////////////////
 class player
 {
-    struct entry
-    {
-        fs::path path;
-        enum { audio, image, video } type;
-        std::optional<msec> len;
-    };
-
     settings data_;
     std::vector<entry> media_;
 
