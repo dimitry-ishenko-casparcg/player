@@ -10,6 +10,7 @@
 
 #include <memory>
 
+////////////////////////////////////////////////////////////////////////////////
 namespace uv
 {
 
@@ -21,8 +22,7 @@ udp::udp(loop& loop)
 
 void udp::bind(const address& addr)
 {
-    auto rc = uv_udp_bind(get(), addr.get(), 0);
-    if (rc < 0) throw error{rc, "uv_udp_bind"};
+    if (auto rc = uv_udp_bind(get(), addr.get(), 0); rc < 0) throw error{rc, "uv_udp_bind"};
 }
 
 address udp::local() const
@@ -38,14 +38,12 @@ address udp::local() const
 
 void udp::connect(const address& peer)
 {
-    auto rc = uv_udp_connect(get(), peer.get());
-    if (rc < 0) throw error{rc, "uv_udp_connect"};
+    if (auto rc = uv_udp_connect(get(), peer.get()); rc < 0) throw error{rc, "uv_udp_connect"};
 }
 
 void udp::disconnect()
 {
-    auto rc = uv_udp_connect(get(), nullptr);
-    if (rc < 0) throw error{rc, "uv_udp_connect"};
+    if (auto rc = uv_udp_connect(get(), nullptr); rc < 0) throw error{rc, "uv_udp_connect"};
 }
 
 void udp::on_recv(recv_callback cb)
@@ -78,10 +76,8 @@ void udp::send(std::string data, const sockaddr* to)
     auto buf = uv_buf_init(req->payload.data(), req->payload.size());
     auto cb = [](uv_udp_send_t* s, int){ delete static_cast<request*>(s); };
 
-    auto rc = uv_udp_send(req.get(), get(), &buf, 1, to, cb);
-    if (rc < 0) throw error{rc, "uv_udp_send"};
-
-    (void)req.release(); // freed inside send()
+    if (auto rc = uv_udp_send(req.get(), get(), &buf, 1, to, cb); rc < 0) throw error{rc, "uv_udp_send"};
+    req.release(); // NOLINT(bugprone-unused-return-value) - freed inside send()
 }
 
 }
