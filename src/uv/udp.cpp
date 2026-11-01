@@ -77,7 +77,7 @@ void udp::send(std::string data, const sockaddr* to)
     auto cb = [](uv_udp_send_t* s, int){ delete static_cast<request*>(s); };
 
     if (auto rc = uv_udp_send(req.get(), get(), &buf, 1, to, cb); rc < 0) throw error{rc, "uv_udp_send"};
-    req.release(); // NOLINT(bugprone-unused-return-value) - freed inside send()
+    req.release(); // NOLINT(bugprone-unused-return-value) - freed inside cb()
 }
 
 }
