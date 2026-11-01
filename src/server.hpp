@@ -24,7 +24,7 @@ public:
 
     void stop() noexcept { proc_.terminate(); }
 
-    enum state { none, ready, loaded, stopping };
+    enum state { none, started, ready, loaded, stopping };
     using state_change_callback = std::function<void(state)>;
     void on_state_changed(state_change_callback cb) { cb_ = std::move(cb); }
 

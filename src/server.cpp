@@ -31,18 +31,30 @@ server::server(uv::loop& loop, const settings& data) : osc_{loop}
         if (!framerate_) framerate_ = (double)msg.value(0).to_int32() / msg.value(1).to_int32();
 
         // watchdog for the screen consumer
-        if (++watch_ > 10) set_state(stopping);
+        if (++watch_ > 10)
+        {
+            std::print("[server] stopping\n");
+            set_state(stopping);
+        }
     });
 
     space_.add("/channel/1/output/port/.*/consumer", [&](auto& msg)
     {
         // watchdog for the screen consumer
-        if (msg.value(0).to_string() == "screen") watch_ = 0;
+        if (msg.value(0).to_string() == "screen")
+        {
+            if (state_ == none)
+            {
+                std::print("[server] starting\n");
+                set_state(started);
+            }
+            watch_ = 0;
+        }
     });
 
     space_.add("/channel/1/stage/layer/0/background/producer", [&](auto& msg)
     {
-        if (state_ == stopping || !framerate_) return;
+        if (state_ == stopping) return;
         set_state(msg.value(0).to_string() == "empty" ? ready : loaded);
     });
 
