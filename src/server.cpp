@@ -28,10 +28,7 @@ server::server(uv::loop& loop, const settings& data) : osc_{loop}
 
     space_.add("/channel/1/framerate", [&](auto& msg)
     {
-        if (!rate_)
-        {
-            rate_ = (double)msg.value(0).to_int32() / (double)msg.value(1).to_int32();
-        }
+        if (!framerate_) framerate_ = (double)msg.value(0).to_int32() / msg.value(1).to_int32();
 
         // watchdog for the screen consumer
         if (++watch_ > 10) set_state(stopping);
@@ -45,7 +42,7 @@ server::server(uv::loop& loop, const settings& data) : osc_{loop}
 
     space_.add("/channel/1/stage/layer/0/background/producer", [&](auto& msg)
     {
-        if (state_ == stopping || !rate_) return;
+        if (state_ == stopping || !framerate_) return;
         set_state(msg.value(0).to_string() == "empty" ? ready : loaded);
     });
 
@@ -124,7 +121,7 @@ void server::load_next(const entry& entry)
     auto cmd = "loadbg 1 \"" + entry.path.string() + "\"";
     if (entry.len)
     {
-        int len = entry.len->count() * rate_ / 1000 + .5;
+        int len = entry.len->count() * framerate_ / 1000 + .5;
         proc_.write(std::format("loadbg 1 \"{}\" length {} mix 30 auto\n", path, len));
     }
     else proc_.write(std::format("loadbg 1 \"{}\" mix 30 auto\n", path));

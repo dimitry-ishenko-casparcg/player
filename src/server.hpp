@@ -42,6 +42,6 @@ private:
     state state_ = none;
     void set_state(state);
 
-    double rate_ = 0;
+    double framerate_ = 0;
     int watch_ = 0;
 };
