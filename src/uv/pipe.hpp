@@ -41,7 +41,7 @@ public:
         auto cb = [](uv_write_t* w, int){ delete static_cast<request*>(w); };
 
         if (auto rc = uv_write(req.get(), stream(), &buf, 1, cb); rc < 0) throw error{ rc, "uv_write" };
-        req.release(); // NOLINT(bugprone-unused-return-value) - freed inside send()
+        req.release(); // NOLINT(bugprone-unused-return-value) - freed inside cb()
     }
 
 private:
