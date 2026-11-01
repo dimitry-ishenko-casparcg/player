@@ -32,7 +32,7 @@ try
         { "-h", "--help",    "Show this help message and exit."   },
         { "-v", "--version", "Show program version and exit."     },
 
-        { "path",            "Path from which to play the media." },
+        { "path",            "Directory from which to play the media." },
     };
 
     std::exception_ptr ep;
@@ -53,6 +53,9 @@ try
 
     ////////////////////
     settings data{ args["path"].value() };
+    if (!fs::is_directory(data.media_path)) throw pgm::invalid_argument{
+        "'" + data.media_path.string() + "' is not a directory"
+    };
 
     player player{ std::move(data) };
     player.run();
