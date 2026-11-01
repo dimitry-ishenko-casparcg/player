@@ -112,12 +112,15 @@ void player::run()
     uv::signals sigset{loop, SIGINT, SIGTERM};
     sigset.on_signal([&](int num){ server.stop(); });
 
+    std::size_t index = 0;
+
     server.on_state_changed([&](server::state state)
     {
         switch (state)
         {
+        case server::started:
         case server::ready:
-            // TODO
+            if (index < media_.size()) server.load_next(media_[index++]);
             break;
 
         case server::stopping:
