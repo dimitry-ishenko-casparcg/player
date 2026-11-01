@@ -28,7 +28,7 @@ struct icase_less
     bool operator()(auto&& lhs, auto&& rhs) const
     {
         return std::ranges::lexicographical_compare(lhs, rhs,
-            [](char x, char y){ return std::tolower((unsigned char)x) < std::tolower((unsigned char)y); }
+            [](unsigned char x, unsigned char y){ return std::tolower(x) < std::tolower(y); }
         );
     }
 };
