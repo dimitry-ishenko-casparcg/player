@@ -17,13 +17,14 @@
 
 #include <uv.h>
 
-using msec = std::chrono::milliseconds;
-using namespace std::chrono_literals;
-
 ////////////////////////////////////////////////////////////////////////////////
 namespace uv
 {
 
+using msec = std::chrono::milliseconds;
+using namespace std::chrono_literals;
+
+////////////////////////////////////////////////////////////////////////////////
 class timer : public handle<uv_timer_t>
 {
 public:
