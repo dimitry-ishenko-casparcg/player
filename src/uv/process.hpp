@@ -10,8 +10,8 @@
 #include "handle.hpp"
 #include "loop.hpp"
 #include "pipe.hpp"
+#include "timer.hpp"
 
-#include <csignal>
 #include <functional>
 #include <memory>
 #include <string>
@@ -31,6 +31,10 @@ public:
 
     process() = default;
     process(loop&, std::vector<std::string> args, std::vector<std::string> env = {});
+    ~process() { teardown(); }
+
+    process(process&&) noexcept = default;
+    process& operator=(process&&) noexcept;
 
     void on_exit(exit_callback cb) { *exit_cb_ = std::move(cb); }
 
@@ -38,13 +42,16 @@ public:
     void write(std::string data) { stdin_.write(std::move(data)); }
 
     int pid() const noexcept { return get()->pid; }
-
     int signal(int n) noexcept { return uv_process_kill(get(), n); }
-    int terminate() noexcept { return signal(SIGTERM); }
-    int kill() noexcept { return signal(SIGKILL); }
+
+    void stop(msec timeout = 1000ms);
 
 private:
     std::unique_ptr<exit_callback> exit_cb_ = std::make_unique<exit_callback>();
+
+    timer timer_;
+    void teardown() noexcept;
+
     pipe stdin_, stdout_, stderr_;
 };
 

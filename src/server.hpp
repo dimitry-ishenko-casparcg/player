@@ -22,7 +22,7 @@ public:
     server(uv::loop&, const settings&);
     ~server();
 
-    void stop() noexcept { proc_.terminate(); }
+    void stop() noexcept { proc_.stop(); }
 
     enum state { none, started, ready, loaded, stopping };
     using state_change_callback = std::function<void(state)>;

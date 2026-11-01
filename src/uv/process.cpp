@@ -8,6 +8,8 @@
 #include "error.hpp"
 #include "process.hpp"
 
+#include <csignal>
+
 ////////////////////////////////////////////////////////////////////////////////
 namespace
 {
@@ -23,7 +25,7 @@ namespace uv
 {
 
 process::process(loop& loop, std::vector<std::string> args, std::vector<std::string> env) :
-    stdin_{loop}, stdout_{loop}, stderr_{loop}
+    timer_{loop}, stdin_{loop}, stdout_{loop}, stderr_{loop}
 {
     std::vector<char*> argv;
     for (auto& r : args) argv.push_back(r.data());
@@ -57,6 +59,44 @@ process::process(loop& loop, std::vector<std::string> args, std::vector<std::str
     get()->data = exit_cb_.get();
 
     if (auto rc = uv_spawn(loop.get(), get(), &opts); rc < 0) throw error{rc, "uv_spawn"};
+}
+
+process& process::operator=(process&& rhs) noexcept
+{
+    if (this != &rhs)
+    {
+        teardown();
+        handle::operator=(std::move(rhs));
+
+        exit_cb_= std::move(rhs.exit_cb_);
+        stdin_  = std::move(rhs.stdin_  );
+        stdout_ = std::move(rhs.stdout_ );
+        stderr_ = std::move(rhs.stderr_ );
+        timer_  = std::move(rhs.timer_  );
+    }
+    return *this;
+}
+
+void process::stop(msec timeout)
+{
+    if (is_active())
+    {
+        signal(SIGTERM);
+        timer_.start(timeout, [this]{ if (is_active()) signal(SIGKILL); });
+    }
+}
+
+void process::teardown() noexcept
+{
+    if (is_active())
+    {
+        *exit_cb_ = nullptr;
+
+        try { stop(); }
+        catch (...) { signal(SIGKILL); }
+
+        while (is_active()) uv_run(get()->loop, UV_RUN_ONCE);
+    }
 }
 
 }
