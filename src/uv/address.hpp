@@ -27,8 +27,7 @@ public:
 
     address(const std::string& ip, int port)
     {
-        auto rc = uv_ip4_addr(ip.data(), port, &addr_);
-        if (rc < 0) throw error{rc, "uv_ip4_addr"};
+        if (auto rc = uv_ip4_addr(ip.data(), port, &addr_); rc < 0) throw error{rc, "uv_ip4_addr"};
     }
 
     std::string ip() const
