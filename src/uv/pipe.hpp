@@ -17,6 +17,7 @@
 
 #include <uv.h>
 
+////////////////////////////////////////////////////////////////////////////////
 namespace uv
 {
 
@@ -39,10 +40,8 @@ public:
         auto buf = uv_buf_init(req->payload.data(), req->payload.size());
         auto cb = [](uv_write_t* w, int){ delete static_cast<request*>(w); };
 
-        int rc = uv_write(req.get(), stream(), &buf, 1, cb);
-        if (rc < 0) throw error{ rc, "uv_write" };
-
-        (void)req.release(); // freed inside send()
+        if (auto rc = uv_write(req.get(), stream(), &buf, 1, cb); rc < 0) throw error{ rc, "uv_write" };
+        req.release(); // NOLINT(bugprone-unused-return-value) - freed inside send()
     }
 
 private:
