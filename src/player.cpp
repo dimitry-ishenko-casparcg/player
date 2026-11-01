@@ -56,8 +56,13 @@ const std::set<std::string, icase_less> video_exten
 ////////////////////////////////////////////////////////////////////////////////
 player::player(settings data) : data_{std::move(data)}
 {
-    auto add_media = [&](const fs::path& path, bool verbose)
+    fs::recursive_directory_iterator iter{ data_.media_path,
+        fs::directory_options::follow_directory_symlink | fs::directory_options::skip_permission_denied
+    };
+
+    for (auto& dirent : iter)
     {
+        auto& path = dirent.path();
         if (fs::is_regular_file(path))
         {
             entry entry;
@@ -87,19 +92,7 @@ player::player(settings data) : data_{std::move(data)}
 
             media_.push_back(std::move(entry));
         }
-        else if (verbose) std::print("[player] ignoring '{}'\n", path.string());
-    };
-
-    if (fs::is_directory(data_.media_path))
-    {
-        fs::recursive_directory_iterator iter{ data_.media_path,
-            fs::directory_options::follow_directory_symlink | fs::directory_options::skip_permission_denied
-        };
-        for (auto&& entry : iter) add_media(entry.path(), false);
     }
-    else add_media(data_.media_path, true);
-
-    if (media_.empty()) throw std::invalid_argument{"[player] nothing to play!"};
 
     std::ranges::sort(media_, {}, &entry::path);
 }
@@ -113,13 +106,14 @@ void player::run()
     sigset.on_signal([&](int num){ server.stop(); });
 
     std::size_t index = 0;
-
     server.on_state_changed([&](server::state state)
     {
         switch (state)
         {
         case server::started:
         case server::ready:
+            if (media_.empty()) break;
+
             if (data_.loop || index < media_.size())
             {
                 index = (index + 1) % media_.size();
