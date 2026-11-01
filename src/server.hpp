@@ -24,7 +24,7 @@ public:
 
     void stop() noexcept { proc_.terminate(); }
 
-    enum state { starting, ready, loaded, stopping };
+    enum state { none, ready, loaded, stopping };
     using state_change_callback = std::function<void(state)>;
     void on_state_changed(state_change_callback cb) { cb_ = std::move(cb); }
 
@@ -39,7 +39,7 @@ private:
     uv::process proc_;
 
     state_change_callback cb_;
-    state state_ = starting;
+    state state_ = none;
     void set_state(state);
 
     double rate_ = 0;
