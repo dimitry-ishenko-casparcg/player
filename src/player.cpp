@@ -60,38 +60,42 @@ player::player(settings data) : data_{std::move(data)}
         fs::directory_options::follow_directory_symlink | fs::directory_options::skip_permission_denied
     };
 
-    for (auto& dirent : iter)
+    for (const fs::recursive_directory_iterator end{ }; iter != end; ++iter)
     {
-        auto& path = dirent.path();
-        if (fs::is_regular_file(path))
+        auto& path = iter->path();
+        if (path.filename().string().starts_with('.'))
         {
-            entry entry;
-            auto exten = path.extension().string();
-            std::string_view type;
-
-            if (audio_exten.contains(exten))
-            {
-                entry.type = entry::audio;
-                type = "audio";
-            }
-            else if (image_exten.contains(exten))
-            {
-                entry.type = entry::image;
-                type = "image";
-                entry.len = data_.image_len;
-            }
-            else if (video_exten.contains(exten))
-            {
-                entry.type = entry::video;
-                type = "video";
-            }
-            else return;
-
-            entry.path = fs::canonical(path);
-            std::print("[player] adding {} '{}'\n", type, entry.path.string());
-
-            media_.push_back(std::move(entry));
+            if (iter->is_directory()) iter.disable_recursion_pending();
+            continue;
         }
+        if (!fs::is_regular_file(path)) continue;
+
+        entry entry;
+        auto exten = path.extension().string();
+        std::string_view type;
+
+        if (audio_exten.contains(exten))
+        {
+            entry.type = entry::audio;
+            type = "audio";
+        }
+        else if (image_exten.contains(exten))
+        {
+            entry.type = entry::image;
+            type = "image";
+            entry.len = data_.image_len;
+        }
+        else if (video_exten.contains(exten))
+        {
+            entry.type = entry::video;
+            type = "video";
+        }
+        else continue;
+
+        entry.path = fs::canonical(path);
+        std::print("[player] adding {} '{}'\n", type, entry.path.string());
+
+        media_.push_back(std::move(entry));
     }
 
     std::ranges::sort(media_, {}, &entry::path);
