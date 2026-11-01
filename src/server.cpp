@@ -116,6 +116,20 @@ server::server(uv::loop& loop, const settings& data) : osc_{loop}
     });
 }
 
+void server::load_next(const entry& entry)
+{
+    auto path = entry.path.string();
+    std::print("[server] loading '{}'\n", path);
+
+    auto cmd = "loadbg 1 \"" + entry.path.string() + "\"";
+    if (entry.len)
+    {
+        int len = entry.len->count() * rate_ / 1000 + .5;
+        proc_.write(std::format("loadbg 1 \"{}\" length {} mix 30 auto\n", path, len));
+    }
+    else proc_.write(std::format("loadbg 1 \"{}\" mix 30 auto\n", path));
+}
+
 void server::set_state(state new_state)
 {
     if (new_state != state_)

@@ -28,6 +28,8 @@ public:
     using state_change_callback = std::function<void(state)>;
     void on_state_changed(state_change_callback cb) { cb_ = std::move(cb); }
 
+    void load_next(const entry&);
+
 private:
     fs::path config_dir_;
 
