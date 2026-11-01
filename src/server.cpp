@@ -28,10 +28,9 @@ server::server(uv::loop& loop, const settings& data) : osc_{loop}
 
     space_.add("/channel/1/framerate", [&](auto& msg)
     {
-        if (!fps_)
+        if (!rate_)
         {
-            fps_ = (double)msg.value(0).to_int32() / msg.value(1).to_int32();
-            std::print("[server] framerate = {:.2f}hz\n", *fps_);
+            rate_ = (double)msg.value(0).to_int32() / (double)msg.value(1).to_int32();
         }
 
         // watchdog for the screen consumer
@@ -46,7 +45,7 @@ server::server(uv::loop& loop, const settings& data) : osc_{loop}
 
     space_.add("/channel/1/stage/layer/0/background/producer", [&](auto& msg)
     {
-        if (state_ == stopping || !fps_) return;
+        if (state_ == stopping || !rate_) return;
         set_state(msg.value(0).to_string() == "empty" ? ready : loaded);
     });
 

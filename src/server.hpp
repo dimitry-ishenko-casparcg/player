@@ -13,7 +13,6 @@
 #include "uv/udp.hpp"
 
 #include <functional>
-#include <optional>
 #include <osc++.hpp>
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -41,6 +40,6 @@ private:
     state state_ = starting;
     void set_state(state);
 
-    std::optional<double> fps_;
+    double rate_ = 0;
     int watch_ = 0;
 };
