@@ -120,7 +120,11 @@ void player::run()
         {
         case server::started:
         case server::ready:
-            if (index < media_.size()) server.load_next(media_[index++]);
+            if (data_.loop || index < media_.size())
+            {
+                index = (index + 1) % media_.size();
+                server.load_next(media_[index]);
+            }
             break;
 
         case server::stopping:
