@@ -51,11 +51,6 @@ public:
 
     void stop() noexcept { uv_timer_stop(get()); }
 
-    bool is_active() const noexcept
-    {
-        return uv_is_active(reinterpret_cast<const uv_handle_t*>(get()));
-    }
-
 private:
     std::unique_ptr<timer_callback> cb_ = std::make_unique<timer_callback>();
 };

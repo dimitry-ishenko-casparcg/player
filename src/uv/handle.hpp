@@ -35,6 +35,11 @@ public:
     V* get() noexcept { return p_.get(); }
     const V* get() const noexcept { return p_.get(); }
 
+    bool is_active() const noexcept
+    {
+        return get() && uv_is_active(reinterpret_cast<const uv_handle_t*>(get()));
+    }
+
 protected:
     void init(auto&& fn, const char* name)
     {
