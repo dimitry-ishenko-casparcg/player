@@ -150,6 +150,8 @@ void server::set_state(state new_state)
 
 server::~server()
 {
+    proc_ = uv::process{ };
+
     if (!config_dir_.empty())
     {
         std::print("[server] removing temp dir\n");
