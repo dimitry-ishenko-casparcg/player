@@ -20,7 +20,6 @@ class server
 {
 public:
     server(uv::loop&, const settings&);
-    ~server();
 
     void stop() noexcept { proc_.terminate(); }
 
@@ -31,7 +30,14 @@ public:
     void load_next(const entry&);
 
 private:
-    fs::path config_dir_;
+    struct tmpdir
+    {
+        explicit tmpdir(int pid);
+        ~tmpdir();
+
+        fs::path path;
+    }
+    tmpdir_;
 
     uv::udp osc_;
     osc::address_space space_;

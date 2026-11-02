@@ -11,12 +11,30 @@
 #include <format>
 #include <fstream>
 #include <print>
-#include <utility>
 
 #include <uv.h>
 
 ////////////////////////////////////////////////////////////////////////////////
-server::server(uv::loop& loop, const settings& data) : osc_{loop}
+server::tmpdir::tmpdir(int pid) :
+    path{ fs::temp_directory_path() / ("player-" + std::to_string(pid)) }
+{
+    fs::create_directories(path);
+    std::print("[server] created temp dir: '{}'\n", path.string());
+}
+
+server::tmpdir::~tmpdir()
+{
+    if (!path.empty())
+    {
+        std::print("[server] removing temp dir\n");
+        std::error_code ec;
+        fs::remove_all(path, ec);
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+server::server(uv::loop& loop, const settings& data) :
+    tmpdir_{ uv_os_getpid() }, osc_{ loop }
 {
     osc_.bind({ "127.0.0.1", 0 });
     osc_.on_recv([&](std::string_view data, const uv::address&)
@@ -59,18 +77,10 @@ server::server(uv::loop& loop, const settings& data) : osc_{loop}
     });
 
     std::print("[server] generating config\n");
-
-    auto pid = uv_os_getpid();
-    auto tmpdir = fs::temp_directory_path() / ("player-" + std::to_string(pid));
-    fs::create_directories(tmpdir);
-
-    std::print("[server] created temp dir: '{}'\n", tmpdir.string());
-
-    config_dir_ = std::move(tmpdir);
-    auto config_path = config_dir_ / "casparcg.config";
-
     std::ofstream file;
     file.exceptions(std::ios_base::failbit | std::ios_base::badbit);
+
+    auto config_path = tmpdir_.path / "casparcg.config";
     file.open(config_path);
 
     constexpr auto tmpl = R"(<?xml version="1.0" encoding="utf-8"?>
@@ -109,7 +119,7 @@ server::server(uv::loop& loop, const settings& data) : osc_{loop}
     </osc>
 </configuration>
 )";
-    auto config = std::format(tmpl, config_dir_.string(), osc_.local().port());
+    auto config = std::format(tmpl, tmpdir_.path.string(), osc_.local().port());
 
     file.write(config.data(), config.size());
     file.close();
@@ -145,17 +155,5 @@ void server::set_state(state new_state)
     {
         state_ = new_state;
         if (cb_) cb_(state_);
-    }
-}
-
-server::~server()
-{
-    proc_ = uv::process{ };
-
-    if (!config_dir_.empty())
-    {
-        std::print("[server] removing temp dir\n");
-        std::error_code ec;
-        fs::remove_all(config_dir_, ec);
     }
 }
