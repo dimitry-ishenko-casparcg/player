@@ -18,10 +18,6 @@
 namespace fs = std::filesystem;
 
 ////////////////////////////////////////////////////////////////////////////////
-void show_usage(const pgm::args& args, const std::string& name);
-void show_version(const std::string& name);
-
-////////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 try
 {
@@ -41,12 +37,12 @@ try
 
     if (args["--help"])
     {
-        show_usage(args, name);
+        std::print("{}\n", args.usage(name));
         return 0;
     }
     else if (args["--version"])
     {
-        show_version(name);
+        std::print("{} version {}\n", name, VERSION);
         return 0;
     }
     else if (ep) std::rethrow_exception(ep);
@@ -66,15 +62,4 @@ catch (const std::exception& e)
 {
     std::print(stderr, "{}\n", e.what());
     return 1;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void show_usage(const pgm::args& args, const std::string& name)
-{
-    std::print("{}\n", args.usage(name));
-}
-
-void show_version(const std::string& name)
-{
-    std::print("{} version {}\n", name, VERSION);
 }
