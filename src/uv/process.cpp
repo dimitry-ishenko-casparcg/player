@@ -8,7 +8,6 @@
 #include "error.hpp"
 #include "process.hpp"
 
-#include <csignal>
 #include <iterator> // std::size
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -26,7 +25,7 @@ namespace uv
 {
 
 process::process(loop& loop, std::vector<std::string> args, std::vector<std::string> env) :
-    timer_{loop}, stdin_{loop}, stdout_{loop}, stderr_{loop}
+    stdin_{loop}, stdout_{loop}, stderr_{loop}
 {
     std::vector<char*> argv;
     for (auto& r : args) argv.push_back(r.data());
@@ -66,37 +65,47 @@ process& process::operator=(process&& rhs) noexcept
 {
     if (this != &rhs)
     {
-        teardown();
-        handle::operator=(std::move(rhs));
+        join();
 
+        handle::operator=(std::move(rhs));
         exit_cb_= std::move(rhs.exit_cb_);
         stdin_  = std::move(rhs.stdin_  );
         stdout_ = std::move(rhs.stdout_ );
         stderr_ = std::move(rhs.stderr_ );
-        timer_  = std::move(rhs.timer_  );
     }
     return *this;
 }
 
-void process::stop(msec timeout)
+void process::wait() const
 {
-    if (is_active())
-    {
-        signal(SIGTERM);
-        timer_.start(timeout, [this]{ if (is_active()) signal(SIGKILL); });
-    }
+    while (is_active()) uv_run(get()->loop, UV_RUN_ONCE);
 }
 
-void process::teardown() noexcept
+bool process::wait_for(msec timeout) const
+{
+    if (!is_active()) return true;
+
+    bool expired = false;
+    timer timer{ get()->loop };
+    timer.start(timeout, [&]{ expired = true; });
+
+    while (is_active() && !expired) uv_run(get()->loop, UV_RUN_ONCE);
+
+    return !is_active();
+}
+
+void process::join() noexcept
 {
     if (is_active())
     {
         *exit_cb_ = nullptr;
 
-        try { stop(); }
-        catch (...) { signal(SIGKILL); }
+        terminate();
+        try { if (wait_for(3000ms)) return; }
+        catch (...) { }
 
-        while (is_active()) uv_run(get()->loop, UV_RUN_ONCE);
+        kill();
+        wait();
     }
 }
 

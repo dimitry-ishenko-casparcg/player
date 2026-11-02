@@ -12,6 +12,7 @@
 #include "pipe.hpp"
 #include "timer.hpp"
 
+#include <csignal>
 #include <functional>
 #include <memory>
 #include <string>
@@ -31,28 +32,42 @@ public:
 
     process() = default;
     process(loop&, std::vector<std::string> args, std::vector<std::string> env = {});
-    ~process() { teardown(); }
+    ~process() { join(); }
 
     process(process&&) noexcept = default;
     process& operator=(process&&) noexcept;
 
     void on_exit(exit_callback cb) { *exit_cb_ = std::move(cb); }
 
-    ////////////////////
     void write(std::string data) { stdin_.write(std::move(data)); }
 
+    ////////////////////
     int pid() const noexcept { return get()->pid; }
-    int signal(int n) noexcept { return uv_process_kill(get(), n); }
 
-    void stop(msec timeout = 1000ms);
+    int signal(int n) noexcept { return is_active() ? uv_process_kill(get(), n) : UV_ESRCH; }
+    int terminate() noexcept { return signal(SIGTERM); }
+    int kill() noexcept { return signal(SIGKILL); }
+
+    void wait() const;
+
+    template<typename Rep, typename Period>
+    bool wait_for(const std::chrono::duration<Rep, Period>& dur) const
+    {
+        return wait_for(std::chrono::ceil<msec>(dur));
+    }
+    bool wait_for(msec) const;
+
+    template<typename Clock, typename Dur>
+    bool wait_until(const std::chrono::time_point<Clock, Dur>& tp) const
+    {
+        return wait_for(std::chrono::ceil<msec>(tp - Clock::now()));
+    }
 
 private:
     std::unique_ptr<exit_callback> exit_cb_ = std::make_unique<exit_callback>();
-
-    timer timer_;
-    void teardown() noexcept;
-
     pipe stdin_, stdout_, stderr_;
+
+    void join() noexcept;
 };
 
 }
