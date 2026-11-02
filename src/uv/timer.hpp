@@ -31,7 +31,6 @@ class timer : public handle<uv_timer_t>
 public:
     using timer_callback = std::function<void()>;
 
-    timer() = default;
     explicit timer(loop& loop) : timer{ loop.get() } { }
 
     void start(msec timeout, timer_callback cb)
