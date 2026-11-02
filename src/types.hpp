@@ -29,6 +29,16 @@ struct settings
     fs::path media_path;
     fs::path server_path = "casparcg-server";
 
+    struct size { int width = 1920, height = 1080; } size;
+    struct pos  { int x = 0, y = 0; } pos;
+    struct rate { int num = 60000, den = 1000; } rate;
+    std::string cadence = "800";
+
+    bool full_screen = false;
+    bool border = false;
+    std::string mode = "stretch";
+    bool topmost = false;
+
     msec image_len = 10s;
     bool loop = true;
 };
