@@ -11,6 +11,7 @@
 #include "handle.hpp"
 #include "loop.hpp"
 
+#include <algorithm>
 #include <chrono>
 #include <functional>
 #include <memory>
@@ -42,7 +43,7 @@ public:
             auto& cb = *static_cast<timer_callback*>(h->data);
             if (cb) cb();
         };
-        auto rc = uv_timer_start(get(), fn, timeout.count(), 0);
+        auto rc = uv_timer_start(get(), fn, std::max(timeout, msec::zero()).count(), 0);
         if (rc < 0) throw error{rc, "uv_timer_start"};
     }
 
