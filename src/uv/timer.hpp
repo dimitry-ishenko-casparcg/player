@@ -31,11 +31,7 @@ public:
     using timer_callback = std::function<void()>;
 
     timer() = default;
-    explicit timer(loop& loop)
-    {
-        init([&](auto* h){ return uv_timer_init(loop.get(), h); }, "uv_timer_init");
-        get()->data = cb_.get();
-    }
+    explicit timer(loop& loop) : timer{ loop.get() } { }
 
     void start(msec timeout, timer_callback cb)
     {
@@ -53,6 +49,13 @@ public:
     void stop() noexcept { uv_timer_stop(get()); }
 
 private:
+    explicit timer(uv_loop_t* loop)
+    {
+        init([&](auto* h){ return uv_timer_init(loop, h); }, "uv_timer_init");
+        get()->data = cb_.get();
+    }
+    friend class process;
+
     std::unique_ptr<timer_callback> cb_ = std::make_unique<timer_callback>();
 };
 
