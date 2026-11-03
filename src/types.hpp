@@ -24,14 +24,18 @@ struct entry
     std::optional<msec> len;
 };
 
+struct size { int width, height; };
+struct pos  { int x, y; };
+struct rate { int num, den; };
+
 struct settings
 {
     fs::path media_path;
     fs::path server_path = "casparcg-server";
 
-    struct size { int width = 1920, height = 1080; } size;
-    struct pos  { int x = 0, y = 0; } pos;
-    struct rate { int num = 60000, den = 1000; } rate;
+    struct size size { 1920, 1080 };
+    struct pos  pos  { 0, 0 };
+    struct rate rate { 60000, 1000 };
     std::string cadence = "800";
 
     bool full_screen = false;
