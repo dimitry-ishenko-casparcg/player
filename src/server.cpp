@@ -11,6 +11,7 @@
 #include <format>
 #include <fstream>
 #include <print>
+#include <utility>
 
 #include <uv.h>
 
@@ -167,9 +168,11 @@ void server::load_next(const entry& entry)
     if (entry.len)
     {
         int len = entry.len->count() * framerate_ / 1000 + .5;
-        proc_.write(std::format("loadbg 1 \"{}\" length {} mix 30 auto\n", path, len));
+        cmd.append(" length " + std::to_string(len));
     }
-    else proc_.write(std::format("loadbg 1 \"{}\" mix 30 auto\n", path));
+    cmd.append(" mix 30 auto\n");
+
+    proc_.write(std::move(cmd));
 }
 
 void server::set_state(state new_state)
