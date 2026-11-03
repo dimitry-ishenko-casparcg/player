@@ -8,34 +8,53 @@
 #include "player.hpp"
 #include "types.hpp"
 
+#include <algorithm>
 #include <charconv>
 #include <cmath>
 #include <exception>
 #include <filesystem>
 #include <pgm/args.hpp>
 #include <print>
-#include <ranges>
 #include <string_view>
-#include <tuple>
 #include <utility>
 
 namespace fs = std::filesystem;
 
 ////////////////////////////////////////////////////////////////////////////////
-std::tuple<int, int> parse2(std::string_view val, char sep)
+template <typename V>
+pgm::expected<V> parse(std::string_view val)
 {
-    auto p = val.find(sep);
-    if (p == val.npos) pgm::invalid_argument{"missing separator"};
+    V n;
+    auto [p, ec] = std::from_chars(val.data(), val.data() + val.size(), n);
+    if (ec != std::errc{} || p != val.data() + val.size()) return pgm::unexpected("bad value");
+    return n;
+}
 
-    int n1 = 0;
-    auto [p1, ec1] = std::from_chars(val.data(), val.data() + p, n1);
-    if (ec1 != std::errc{}) throw pgm::invalid_argument{"bad first value"};
+template <typename V>
+pgm::expected<V> parse(std::string_view val, char ch)
+{
+    auto p = val.find(ch);
+    if (p == val.npos) return pgm::unexpected("missing separator");
 
-    int n2 = 0;
-    auto [p2, ec2] = std::from_chars(val.data() + p + 1, val.data() + val.size(), n2);
-    if (ec2 != std::errc{}) throw pgm::invalid_argument{"bad second value"};
+    [[maybe_unused]] auto [x, y] = V{ };
+    using X = decltype(x);
+    using Y = decltype(y);
 
-    return { n1, n2 };
+    return parse<X>(val.substr(0, p)).and_then([&](X x) {
+        return parse<Y>(val.substr(p + 1)).transform([&](Y y) { return V{x, y}; });
+    });
+}
+
+template<> pgm::expected<size> pgm::convert(std::string_view val) { return parse<size>(val, 'x'); }
+template<> pgm::expected<pos > pgm::convert(std::string_view val) { return parse<pos >(val, ','); }
+template<> pgm::expected<rate> pgm::convert(std::string_view val) { return parse<rate>(val, '/'); }
+
+struct mode { std::string val; };
+template<> pgm::expected<mode> pgm::convert(std::string_view val)
+{
+    static constexpr auto modes = { "original", "stretch", "fit", "fill", "hfill", "vfill" };
+    if (!std::ranges::contains(modes, val)) return pgm::unexpected("bad mode");
+    return mode{ std::string{val} };
 }
 
 constexpr auto eq(double x, double y) { return std::abs(x - y) < 1e-9; };
@@ -110,17 +129,11 @@ try
 
     // TODO: parse config files
 
-    auto& size = args["--size"];
-    if (size) std::tie(data.size.width, data.size.height) = parse2(size.value(), 'x');
+    if (auto& arg = args["--size"]) data.size = arg.value<size>();
+    if (auto& arg = args["--pos" ]) data.pos  = arg.value<pos >();
+    if (auto& arg = args["--rate"]) data.rate = arg.value<rate>();
 
-    auto& pos = args["--pos"];
-    if (pos) std::tie(data.pos.x, data.pos.y) = parse2(pos.value(), ',');
-
-    auto& rate = args["--rate"];
-    if (rate) std::tie(data.rate.num, data.rate.den) = parse2(rate.value(), '/');
-
-    auto& cadence = args["--cadence"];
-    if (cadence) data.cadence = cadence.value();
+    if (auto& arg = args["--cadence"]) data.cadence = arg.value();
     else
     {
         auto fr = (double)data.rate.num / data.rate.den;
@@ -139,14 +152,7 @@ try
     if (args["--border"]) data.border = true;
     if (args["--topmost"]) data.topmost = true;
 
-    auto& mode = args["--mode"];
-    if (mode)
-    {
-        data.mode = mode.value();
-
-        static constexpr auto modes = { "original", "stretch", "fit", "fill", "hfill", "vfill" };
-        if (!std::ranges::contains(modes, data.mode)) throw std::invalid_argument{"bad mode"};
-    }
+    if (auto& arg = args["--mode"]) data.mode = arg.value<mode>().val;
 
     ////////////////////
     player player{ std::move(data) };
