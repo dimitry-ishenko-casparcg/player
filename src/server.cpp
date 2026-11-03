@@ -170,8 +170,10 @@ void server::load_next(const entry& entry)
         int len = entry.len->count() * framerate_ / 1000 + .5;
         cmd.append(" length " + std::to_string(len));
     }
-    cmd.append(" mix 30 auto\n");
+    cmd.append(" mix 30");
+    if (entry.mode) cmd.append(" scale_mode " + entry.mode.value());
 
+    cmd.append(" auto\n");
     proc_.write(std::move(cmd));
 }
 

@@ -21,7 +21,9 @@ struct entry
 {
     fs::path path;
     enum { audio, image, video } type;
+
     std::optional<msec> len;
+    std::optional<std::string> mode;
 };
 
 struct size { int width, height; };

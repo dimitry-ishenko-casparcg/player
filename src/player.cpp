@@ -70,7 +70,7 @@ player::player(settings data) : data_{std::move(data)}
         }
         if (!fs::is_regular_file(path)) continue;
 
-        entry entry;
+        entry entry{ .mode = data_.mode };
         auto exten = path.extension().string();
         std::string_view type;
 
