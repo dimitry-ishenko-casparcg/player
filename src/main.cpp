@@ -145,7 +145,7 @@ try
         else if (eq(fr, 50    )) data.cadence =  "960";
         else if (eq(fr, 59.94 )) data.cadence =  "801,801,800,801,801";
         else if (eq(fr, 60    )) data.cadence =  "800";
-        else throw pgm::missing_argument{"missing cadence for non-standard rate"};
+        else throw pgm::missing_argument{"need cadence for non-standard frame rate"};
     }
 
     if (args["--full-screen"]) data.full_screen = true;
