@@ -83,6 +83,10 @@ server::server(uv::loop& loop, const settings& data) :
     auto config_path = tmpdir_.path / "casparcg.config";
     file.open(config_path);
 
+    auto mode_id = std::format("{}x{}_{:.0f}",
+        data.size.width, data.size.height, 100. * data.rate.num / data.rate.den
+    );
+
     constexpr auto tmpl = R"(<?xml version="1.0" encoding="utf-8"?>
 <configuration>
     <paths>
@@ -91,14 +95,27 @@ server::server(uv::loop& loop, const settings& data) :
         <data-path>{0}</data-path>
         <template-path>{0}</template-path>
     </paths>
+    <video-modes>
+        <video-mode>
+            <id>{1}</id>
+            <width>{2}</width><height>{3}</height>
+            <time-scale>{4}</time-scale><duration>{5}</duration>
+            <cadence>{6}</cadence>
+        </video-mode>
+    </video-modes>
     <html>
         <cache-path>{0}/cef</cache-path>
     </html>
     <channels>
         <channel>
-            <video-mode>1080p5994</video-mode>
+            <video-mode>{1}</video-mode>
             <consumers>
-                <screen />
+                <screen>
+                    <windowed>{7}</windowed>
+                    <borderless>{8}</borderless>
+                    <always-on-top>{9}</always-on-top>
+                    <x>{10}</x><y>{11}</y>
+                </screen>
                 <system-audio />
             </consumers>
         </channel>
@@ -113,13 +130,19 @@ server::server(uv::loop& loop, const settings& data) :
       <predefined-clients>
         <predefined-client>
           <address>127.0.0.1</address>
-          <port>{1}</port>
+          <port>{12}</port>
         </predefined-client>
       </predefined-clients>
     </osc>
 </configuration>
 )";
-    auto config = std::format(tmpl, tmpdir_.path.string(), osc_.local().port());
+    auto config = std::format(tmpl,
+        tmpdir_.path.string(), // 0
+        mode_id, data.size.width, data.size.height, data.rate.num, data.rate.den, data.cadence, // 1-6
+        !data.full_screen, !data.border, data.topmost, // 7-9
+        data.pos.x, data.pos.y, // 10-11
+        osc_.local().port() // 12
+    );
 
     file.write(config.data(), config.size());
     file.close();
