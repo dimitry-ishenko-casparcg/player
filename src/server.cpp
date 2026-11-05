@@ -64,6 +64,10 @@ server::server(uv::loop& loop, const settings& data) :
         {
             if (state_ == none)
             {
+                proc_.write("mixer 1 clear\n");
+                proc_.write("mixer 1 anchor .5 .5\n");
+                proc_.write("mixer 1 fill .5 .5 1 1\n");
+
                 std::print("[server] starting\n");
                 set_state(started);
             }
