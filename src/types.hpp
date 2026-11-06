@@ -18,6 +18,31 @@ using msec = std::chrono::milliseconds;
 using namespace std::chrono_literals;
 
 ////////////////////////////////////////////////////////////////////////////////
+constexpr auto types = { "cut", "mix", "push", "slide", "wipe", "fadecut", "cutfade", "vfade" };
+
+constexpr auto tweens = { "linear",
+    "easeinquad"   , "easeoutquad"   , "easeinoutquad"   , "easeoutinquad"   ,
+    "easeincubic"  , "easeoutcubic"  , "easeinoutcubic"  , "easeoutincubic"  ,
+    "easeinquart"  , "easeoutquart"  , "easeinoutquart"  , "easeoutinquart"  ,
+    "easeinquint"  , "easeoutquint"  , "easeinoutquint"  , "easeoutinquint"  ,
+    "easeinsine"   , "easeoutsine"   , "easeinoutsine"   , "easeoutinsine"   ,
+    "easeinexpo"   , "easeoutexpo"   , "easeinoutexpo"   , "easeoutinexpo"   ,
+    "easeincirc"   , "easeoutcirc"   , "easeinoutcirc"   , "easeoutincirc"   ,
+    "easeinelastic", "easeoutelastic", "easeinoutelastic", "easeoutinelastic",
+    "easeinback"   , "easeoutback"   , "easeinoutback"   , "easeoutinback"   ,
+    "easeinbounce" , "easeoutbounce" , "easeinoutbounce" , "easeoutinbounce" ,
+};
+
+constexpr auto dirs = { "left", "fromright", "right", "fromleft", "up", "fromdown", "down", "fromtop" };
+
+struct tran
+{
+    std::string type = "mix";
+    msec len = 500ms;
+    std::optional<std::string> tween;
+    std::optional<std::string> dir;
+};
+
 constexpr auto modes = { "original", "stretch", "fit", "fill", "hfill", "vfill" };
 
 struct entry
@@ -26,6 +51,7 @@ struct entry
     enum { audio, image, video } type;
 
     std::optional<msec> len;
+    std::optional<struct tran> tran;
     std::optional<std::string> mode;
 };
 
@@ -45,9 +71,11 @@ struct settings
 
     bool full_screen = false;
     bool border = false;
-    std::optional<std::string> mode;
     bool topmost = false;
 
     msec image_len = 10s;
     bool loop = true;
+
+    std::optional<struct tran> tran;
+    std::optional<std::string> mode;
 };
