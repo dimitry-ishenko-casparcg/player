@@ -165,15 +165,13 @@ server::server(uv::loop& loop, const settings& data) :
 
 void server::load_next(const entry& entry)
 {
+    auto frames = [rate = framerate_](msec len) -> int { return len.count() / 1000. * rate + .5; };
+
     auto path = entry.path.string();
     std::print("[server] loading '{}'\n", path);
 
     auto cmd = "loadbg 1 \"" + entry.path.string() + "\"";
-    if (entry.len)
-    {
-        int len = entry.len->count() * framerate_ / 1000 + .5;
-        cmd.append(" length " + std::to_string(len));
-    }
+    if (entry.len) cmd.append(" length " + std::to_string(frames(*entry.len)));
     cmd.append(" mix 30");
     if (entry.mode) cmd.append(" scale_mode " + entry.mode.value());
 
