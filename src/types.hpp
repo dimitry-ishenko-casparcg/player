@@ -9,6 +9,7 @@
 
 #include <chrono>
 #include <filesystem>
+#include <initializer_list>
 #include <optional>
 
 namespace fs = std::filesystem;
@@ -17,6 +18,8 @@ using msec = std::chrono::milliseconds;
 using namespace std::chrono_literals;
 
 ////////////////////////////////////////////////////////////////////////////////
+constexpr auto modes = { "original", "stretch", "fit", "fill", "hfill", "vfill" };
+
 struct entry
 {
     fs::path path;
@@ -29,8 +32,6 @@ struct entry
 struct size { int width, height; };
 struct pos  { int x, y; };
 struct rate { int num, den; };
-
-constexpr auto modes = { "original", "stretch", "fit", "fill", "hfill", "vfill" };
 
 struct settings
 {
