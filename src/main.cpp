@@ -9,55 +9,59 @@
 #include "types.hpp"
 
 #include <algorithm>
-#include <charconv>
 #include <cmath>
 #include <cstdlib> // std::getenv
 #include <exception>
 #include <filesystem>
 #include <generator>
+#include <initializer_list>
 #include <pgm/args.hpp>
 #include <print>
 #include <ranges>
 #include <string_view>
 #include <utility>
+#include <vector>
 
 namespace fs = std::filesystem;
 
 ////////////////////////////////////////////////////////////////////////////////
-template <typename V>
-pgm::expected<V> parse(std::string_view val)
+pgm::expected< std::vector<std::string_view> >
+parse(std::string_view s, char ch, std::size_t min, std::size_t max)
 {
-    V n;
-    auto [p, ec] = std::from_chars(val.data(), val.data() + val.size(), n);
-    if (ec != std::errc{} || p != val.data() + val.size()) return pgm::unexpected("bad value");
-    return n;
+    auto parts = std::views::split(s, ch)
+        | std::views::transform([](auto p){ return std::string_view{p}; })
+        | std::ranges::to<std::vector>();
+    if (parts.size() < min || parts.size() > max)
+        return pgm::unexpected("bad value '" + std::string{s} + "'");
+
+    return parts;
 }
 
-template <typename V>
-pgm::expected<V> parse(std::string_view val, char ch)
+template<typename V>
+pgm::expected<V> parse2(std::string_view s, char ch)
 {
-    auto p = val.find(ch);
-    if (p == val.npos) return pgm::unexpected("missing separator");
-
     [[maybe_unused]] auto [x, y] = V{ };
-    using X = decltype(x);
-    using Y = decltype(y);
-
-    return parse<X>(val.substr(0, p)).and_then([&](X x) {
-        return parse<Y>(val.substr(p + 1)).transform([&](Y y) { return V{x, y}; });
+    return parse(s, ch, 2, 2).and_then([](auto&& p){
+        return pgm::convert<decltype (x)>(p[0]).and_then([&](auto x){
+            return pgm::convert<decltype (y)>(p[1]).transform([&](auto y){ return V{x, y}; });
+        });
     });
 }
 
-template<> pgm::expected<size> pgm::convert(std::string_view val) { return parse<size>(val, 'x'); }
-template<> pgm::expected<pos > pgm::convert(std::string_view val) { return parse<pos >(val, ','); }
-template<> pgm::expected<rate> pgm::convert(std::string_view val) { return parse<rate>(val, '/'); }
-
-struct mode { std::string val; };
-template<> pgm::expected<mode> pgm::convert(std::string_view val)
+template<typename V>
+pgm::expected<V> parse_il(std::string_view s, const auto& il)
 {
-    if (!std::ranges::contains(modes, val)) return pgm::unexpected("bad mode");
-    return mode{ std::string{val} };
+    if (!std::ranges::contains(il, s))
+        return pgm::unexpected("bad value '" + std::string{s} + "'");
+    return V{s};
 }
+
+template<> pgm::expected<size> pgm::convert(std::string_view s) { return parse2<size>(s, 'x'); }
+template<> pgm::expected<pos > pgm::convert(std::string_view s) { return parse2<pos >(s, ','); }
+template<> pgm::expected<rate> pgm::convert(std::string_view s) { return parse2<rate>(s, '/'); }
+
+struct mode { std::string_view val; };
+template<> pgm::expected<mode> pgm::convert(std::string_view s) { return parse_il<mode>(s, modes); }
 
 constexpr auto eq(double x, double y) { return std::abs(x - y) < 1e-9; };
 
