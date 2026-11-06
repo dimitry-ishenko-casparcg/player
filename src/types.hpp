@@ -30,6 +30,8 @@ struct size { int width, height; };
 struct pos  { int x, y; };
 struct rate { int num, den; };
 
+constexpr auto modes = { "original", "stretch", "fit", "fill", "hfill", "vfill" };
+
 struct settings
 {
     fs::path media_path;

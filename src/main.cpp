@@ -55,7 +55,6 @@ template<> pgm::expected<rate> pgm::convert(std::string_view val) { return parse
 struct mode { std::string val; };
 template<> pgm::expected<mode> pgm::convert(std::string_view val)
 {
-    static constexpr auto modes = { "original", "stretch", "fit", "fill", "hfill", "vfill" };
     if (!std::ranges::contains(modes, val)) return pgm::unexpected("bad mode");
     return mode{ std::string{val} };
 }
