@@ -11,10 +11,13 @@
 #include <algorithm>
 #include <charconv>
 #include <cmath>
+#include <cstdlib> // std::getenv
 #include <exception>
 #include <filesystem>
+#include <generator>
 #include <pgm/args.hpp>
 #include <print>
+#include <ranges>
 #include <string_view>
 #include <utility>
 
@@ -58,6 +61,30 @@ template<> pgm::expected<mode> pgm::convert(std::string_view val)
 }
 
 constexpr auto eq(double x, double y) { return std::abs(x - y) < 1e-9; };
+
+std::generator<fs::path> conf_dirs()
+{
+    auto env = [](auto name) {
+        auto val = std::getenv(name); return (val && *val) ? val : nullptr;
+    };
+
+#ifdef _WIN32
+    if (auto val = env("APPDATA")) co_yield val;
+    if (auto val = env("ProgramData")) co_yield val;
+#else
+    if (auto val = env("XDG_CONFIG_HOME")) co_yield val;
+    else if (auto val = env("HOME")) co_yield fs::path{val} / ".config";
+
+    const char* dirs = env("XDG_CONFIG_DIRS");
+    if (!dirs) dirs = "/etc/xdg";
+
+    for (auto val : std::string_view{dirs} | std::views::split(':'))
+    {
+        std::string_view dir{val};
+        if (dir.size()) co_yield dir;
+    }
+#endif
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
@@ -126,8 +153,27 @@ try
     if (!fs::is_directory(data.media_path)) throw pgm::invalid_argument{
         "'" + data.media_path.string() + "' is not a directory"
     };
+    args.reset();
 
-    // TODO: parse config files
+    for (auto&& dir : conf_dirs())
+    {
+        auto conf_file = dir / name / "player.conf";
+        if (fs::is_regular_file(conf_file))
+        {
+            std::print("[-main-] reading '{}'\n", conf_file.string());
+            args.parse(conf_file);
+            break;
+        }
+    }
+
+    auto conf_file = data.media_path / "player.conf";
+    if (fs::is_regular_file(conf_file))
+    {
+        std::print("[-main-] reading '{}'\n", conf_file.string());
+        args.parse(conf_file);
+    }
+
+    args.parse(argc, argv);
 
     if (auto& arg = args["--size"]) data.size = arg.value<size>();
     if (auto& arg = args["--pos" ]) data.pos  = arg.value<pos >();
