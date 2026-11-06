@@ -93,42 +93,44 @@ try
 
     pgm::args args
     {
-        { "-s", "--size",       "WxH",  "Window size or screen resolution (in full-screen mode).\n"
-                                        "Specified as <width>x<height>. Default: 1920x1080.\n" },
+        { "-s", "--size", "S",      "Window size or screen resolution (in full-screen mode).\n"
+                                    "Specified as <width>x<height>. Default: 1920x1080.\n" },
 
-        { "-p", "--pos",        "X,Y",  "Window position. Specified as <x>,<y>. May not work\n"
-                                        "on all desktops.\n" },
+        { "-p", "--pos", "P",       "Window position. Specified as <x>,<y>. May not work\n"
+                                    "on all desktops.\n" },
 
-        { "-r", "--rate",       "N/D",  "Frame rate. Specified as a fraction <num>/<denom> (e.g.,\n"
-                                        "60000/1001, 50000/1000. Default: 60000/1000.\n" },
+        { "-r", "--rate", "R",      "Frame rate. Specified as a fraction <num>/<denom>\n"
+                                    "(e.g., 60000/1001, 50000/1000). Default: 60000/1000.\n" },
 
-        { "-c", "--cadence",    "C",    "Audio cadence. Specified as a repeating sequence of N\n"
-                                        "sample counts whose sum equals 48000 × N ÷ frame rate.\n"
-                                        "For common frame rates, the default cadence is:\n"
-                                        "  23.976fps > 2002\n"
-                                        "  24fps     > 2000\n"
-                                        "  25fps     > 1920\n"
-                                        "  29.97fps  > 1602,1601,1602,1601,1602\n"
-                                        "  30fps     > 1600\n"
-                                        "  50fps     >  960\n"
-                                        "  59.94fps  >  801,801,800,801,801\n"
-                                        "  60fps     >  800\n"
-                                        "For others, it must be specified manually.\n" },
+        { "-c", "--cadence", "C",   "Audio cadence. Specified as a repeating sequence of N\n"
+                                    "sample counts whose sum equals 48000 × N ÷ frame rate.\n"
+                                    "For common frame rates, the default cadence is:\n"
+                                    "  23.976fps > 2002\n"
+                                    "  24fps     > 2000\n"
+                                    "  25fps     > 1920\n"
+                                    "  29.97fps  > 1602,1601,1602,1601,1602\n"
+                                    "  30fps     > 1600\n"
+                                    "  50fps     >  960\n"
+                                    "  59.94fps  >  801,801,800,801,801\n"
+                                    "  60fps     >  800\n"
+                                    "For others, it must be specified manually.\n" },
 
-        { "-F", "--full-screen",        "Switch to full-screen mode.\n" },
+        { "-F", "--full-screen",    "Switch to full-screen mode. May not work on all\n"
+                                    "desktops.\n" },
 
-        { "-b", "--border",             "Display window with border. If neither --full-screen nor\n"
-                                        "--border is specified, a borderless window is displayed.\n" },
+        { "-b", "--border",         "Display window with border. If neither --full-screen\n"
+                                    "nor --border is specified, a borderless window is.\n"
+                                    "displayed.\n" },
 
-        { "-t", "--topmost",            "Display window above others.\n" },
+        { "-t", "--topmost",        "Position window on top of others.\n" },
 
-        { "-m", "--mode",       "M",    "Image stretch mode. Must be one of: original, stretch,\n"
-                                        "fit, fill, hfill, and vfill.\n" },
+        { "-m", "--mode", "M",      "Image stretch mode. Must be one of: original, stretch,\n"
+                                    "fit, fill, hfill, or vfill.\n"  },
 
-        { "-h", "--help",               "Show this help message and exit."   },
-        { "-v", "--version",            "Show program version and exit."     },
+        { "-h", "--help",           "Show this help message and exit." },
+        { "-v", "--version",        "Show program version and exit."   },
 
-        { "path",                       "Directory from which to play the media." },
+        { "path",                   "Directory from which to play the media." },
     };
 
     std::exception_ptr ep;
