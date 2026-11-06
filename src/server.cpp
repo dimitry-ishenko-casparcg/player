@@ -172,8 +172,14 @@ void server::load_next(const entry& entry)
 
     auto cmd = "loadbg 1 \"" + entry.path.string() + "\"";
     if (entry.len) cmd.append(" length " + std::to_string(frames(*entry.len)));
-    cmd.append(" mix 30");
-    if (entry.mode) cmd.append(" scale_mode " + entry.mode.value());
+    if (entry.tran)
+    {
+        auto& tran = *entry.tran;
+        cmd.append(" " + tran.type + " " + std::to_string(frames(tran.len)));
+        if (tran.tween) cmd.append(" " + *tran.tween);
+        if (tran.dir) cmd.append(" " + *tran.dir);
+    }
+    if (entry.mode) cmd.append(" scale_mode " + *entry.mode);
 
     cmd.append(" auto\n");
     proc_.write(std::move(cmd));
