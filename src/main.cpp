@@ -123,7 +123,7 @@ try
         { "-t", "--topmost",            "Display window above others.\n" },
 
         { "-m", "--mode",       "M",    "Image stretch mode. Must be one of: original, stretch,\n"
-                                        "fit, fill, hfill, and vfill. Default: stretch.\n" },
+                                        "fit, fill, hfill, and vfill.\n" },
 
         { "-h", "--help",               "Show this help message and exit."   },
         { "-v", "--version",            "Show program version and exit."     },

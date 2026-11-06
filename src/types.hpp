@@ -44,7 +44,7 @@ struct settings
 
     bool full_screen = false;
     bool border = false;
-    std::string mode = "stretch";
+    std::optional<std::string> mode;
     bool topmost = false;
 
     msec image_len = 10s;
