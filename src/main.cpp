@@ -38,7 +38,7 @@ parse(std::string_view s, char ch, std::size_t min, std::size_t max)
 }
 
 template<typename V>
-pgm::expected<V> parse2(std::string_view s, char ch)
+pgm::expected<V> parse_2(std::string_view s, char ch)
 {
     [[maybe_unused]] auto [x, y] = V{ };
     return parse(s, ch, 2, 2).and_then([](auto&& p){
@@ -49,19 +49,19 @@ pgm::expected<V> parse2(std::string_view s, char ch)
 }
 
 template<typename V>
-pgm::expected<V> parse_il(std::string_view s, const auto& il)
+pgm::expected<V> parse_list(std::string_view s, const auto& il)
 {
     if (!std::ranges::contains(il, s))
         return pgm::unexpected("bad value '" + std::string{s} + "'");
     return V{s};
 }
 
-template<> pgm::expected<size> pgm::convert(std::string_view s) { return parse2<size>(s, 'x'); }
-template<> pgm::expected<pos > pgm::convert(std::string_view s) { return parse2<pos >(s, ','); }
-template<> pgm::expected<rate> pgm::convert(std::string_view s) { return parse2<rate>(s, '/'); }
+template<> pgm::expected<size> pgm::convert(std::string_view s) { return parse_2<size>(s, 'x'); }
+template<> pgm::expected<pos > pgm::convert(std::string_view s) { return parse_2<pos >(s, ','); }
+template<> pgm::expected<rate> pgm::convert(std::string_view s) { return parse_2<rate>(s, '/'); }
 
 struct mode { std::string_view val; };
-template<> pgm::expected<mode> pgm::convert(std::string_view s) { return parse_il<mode>(s, modes); }
+template<> pgm::expected<mode> pgm::convert(std::string_view s) { return parse_list<mode>(s, modes); }
 
 constexpr auto eq(double x, double y) { return std::abs(x - y) < 1e-9; };
 
