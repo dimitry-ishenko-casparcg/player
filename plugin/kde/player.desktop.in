@@ -9,4 +9,4 @@ X-KDE-MaxNumberOfUrls=1
 [Desktop Action openWithMyCasparCGPlayer]
 Name=Play with CasparCG
 Icon=media-playback-start
-Exec=casparcg-player %f
+Exec=@NAME@ %f

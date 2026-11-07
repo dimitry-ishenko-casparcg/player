@@ -4,7 +4,7 @@ import subprocess
 class CasparCGPlayer(GObject.GObject, Nautilus.MenuProvider):
     def _launch(self, menu, folder):
         path = folder.get_location().get_path()
-        subprocess.Popen(["casparcg-player", path], start_new_session=True)
+        subprocess.Popen(["@NAME@", path], start_new_session=True)
 
     def _make_item(self, files):
         item = Nautilus.MenuItem(
