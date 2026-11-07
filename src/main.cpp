@@ -102,7 +102,7 @@ template<> pgm::expected<tran> pgm::convert(std::string_view s)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-constexpr auto eq(double x, double y) { return std::abs(x - y) < 1e-9; };
+constexpr auto eq(double x, double y) { return std::abs(x - y) < .001; };
 
 std::generator<fs::path> conf_dirs()
 {
@@ -238,15 +238,16 @@ try
     if (auto& arg = args["--cadence"]) data.cadence = arg.value();
     else
     {
-        auto fr = (double)data.rate.num / data.rate.den;
-             if (eq(fr, 23.976)) data.cadence = "2002";
-        else if (eq(fr, 24    )) data.cadence = "2000";
-        else if (eq(fr, 25    )) data.cadence = "1920";
-        else if (eq(fr, 29.97 )) data.cadence = "1602,1601,1602,1601,1602";
-        else if (eq(fr, 30    )) data.cadence = "1600";
-        else if (eq(fr, 50    )) data.cadence =  "960";
-        else if (eq(fr, 59.94 )) data.cadence =  "801,801,800,801,801";
-        else if (eq(fr, 60    )) data.cadence =  "800";
+        auto rate = (double)data.rate.num / data.rate.den;
+        std::print("rate={}\n", rate);
+             if (eq(rate, 23.976)) data.cadence = "2002";
+        else if (eq(rate, 24    )) data.cadence = "2000";
+        else if (eq(rate, 25    )) data.cadence = "1920";
+        else if (eq(rate, 29.97 )) data.cadence = "1602,1601,1602,1601,1602";
+        else if (eq(rate, 30    )) data.cadence = "1600";
+        else if (eq(rate, 50    )) data.cadence =  "960";
+        else if (eq(rate, 59.94 )) data.cadence =  "801,801,800,801,801";
+        else if (eq(rate, 60    )) data.cadence =  "800";
         else throw pgm::missing_argument{"need cadence for non-standard frame rate"};
     }
 
