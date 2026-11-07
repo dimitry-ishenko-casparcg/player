@@ -5,3 +5,4 @@ set(NAME "${PROJECT_NAME}" CACHE STRING "Set application name")
 
 add_subdirectory(src)
 add_subdirectory(plugin)
+add_subdirectory(xdg)
