@@ -60,6 +60,10 @@ template<> pgm::expected<size> pgm::convert(std::string_view s) { return parse_2
 template<> pgm::expected<pos > pgm::convert(std::string_view s) { return parse_2<pos >(s, ','); }
 template<> pgm::expected<rate> pgm::convert(std::string_view s) { return parse_2<rate>(s, '/'); }
 
+template<> pgm::expected<msec> pgm::convert(std::string_view s) {
+    return pgm::convert<unsigned>(s).transform([](auto v){ return msec{v}; });
+}
+
 struct mode { std::string_view val; };
 template<> pgm::expected<mode> pgm::convert(std::string_view s) { return parse_list<mode>(s, modes); }
 
@@ -167,6 +171,9 @@ try
 
         { "-t", "--topmost",        "Position window on top of others.\n" },
 
+        { "-i", "--image-len", "L", "Display length for images in milliseconds.\n"
+                                    "Default: 10000.\n" },
+
         { "-n", "--tran", "N",      "Transition. Specified as <type>,<len>[,tween][,dir].\n"
                                     "Type is be one of: cut, mix, push, slide, wipe,\n"
                                     "fadecut, cutfade, or vfade.\n"
@@ -254,6 +261,8 @@ try
     if (args["--full-screen"]) data.full_screen = true;
     if (args["--border"]) data.border = true;
     if (args["--topmost"]) data.topmost = true;
+
+    if (auto& arg = args["--image-len"]) data.image_len = arg.value<msec>();
 
     if (auto& arg = args["--tran"]) data.tran = arg.value<tran>();
     if (auto& arg = args["--mode"]) data.mode = arg.value<mode>().val;
