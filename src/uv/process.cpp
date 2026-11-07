@@ -39,11 +39,11 @@ process::process(loop& loop, std::vector<std::string> args, std::vector<std::str
     io[0].flags = UV_CREATE_PIPE | UV_READABLE_PIPE;
     io[0].data.stream = reinterpret_cast<uv_stream_t*>(stdin_.get());
 
-    io[1].flags = UV_IGNORE; // TODO
-    io[1].data.stream = reinterpret_cast<uv_stream_t*>(stdout_.get());
+    io[1].flags = UV_INHERIT_FD;
+    io[1].data.fd = 1;
 
-    io[2].flags = UV_IGNORE; // TODO
-    io[2].data.stream = reinterpret_cast<uv_stream_t*>(stderr_.get());
+    io[2].flags = UV_INHERIT_FD;
+    io[2].data.fd = 2;
 
     uv_process_options_t opts{};
     opts.file  = argv.at(0);
