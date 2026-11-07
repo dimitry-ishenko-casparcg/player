@@ -63,6 +63,45 @@ template<> pgm::expected<rate> pgm::convert(std::string_view s) { return parse_2
 struct mode { std::string_view val; };
 template<> pgm::expected<mode> pgm::convert(std::string_view s) { return parse_list<mode>(s, modes); }
 
+template<> pgm::expected<tran> pgm::convert(std::string_view s)
+{
+    auto val = parse(s, ',', 2, 4);
+    if (!val) return pgm::unexpected(val.error());
+
+    struct tran tran;
+    auto& p = *val;
+
+    struct type  { std::string_view val; };
+    struct tween { std::string_view val; };
+    struct dir   { std::string_view val; };
+
+    if (auto v = parse_list<type>(p[0], types))
+        tran.type = v->val;
+    else return pgm::unexpected("bad type '" + std::string{p[0]} + "'");
+
+    if (auto v = pgm::convert<unsigned>(p[1]))
+        tran.len = msec{*v};
+    else return pgm::unexpected("bad len '" + std::string{p[1]} + "'");
+
+    for (std::size_t i = 2; i < p.size(); ++i)
+    {
+        if (auto v = parse_list<tween>(p[i], tweens))
+        {
+            if (tran.tween) return pgm::unexpected("bad dir '" + std::string{p[i]} + "'");
+            tran.tween = v->val;
+        }
+        else if (auto v = parse_list<dir>(p[i], dirs))
+        {
+            if (tran.dir) return pgm::unexpected("bad tween '" + std::string{p[i]} + "'");
+            tran.dir = v->val;
+        }
+        else return pgm::unexpected("bad tween/dir '" + std::string{p[i]} + "'");
+    }
+
+    return tran;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 constexpr auto eq(double x, double y) { return std::abs(x - y) < 1e-9; };
 
 std::generator<fs::path> conf_dirs()
@@ -127,6 +166,18 @@ try
                                     "displayed.\n" },
 
         { "-t", "--topmost",        "Position window on top of others.\n" },
+
+        { "-n", "--tran", "N",      "Transition. Specified as <type>,<len>[,tween][,dir].\n"
+                                    "Type is be one of: cut, mix, push, slide, wipe,\n"
+                                    "fadecut, cutfade, or vfade.\n"
+                                    "Length is a number of milliseconds.\n"
+                                    "Tween is either linear or ease<X><Y>, with X being:\n"
+                                    "in, out, inout, or outin; and Y being: quad, cubic,\n"
+                                    "quart, quint, sine, expo, circ, elastic, back,\n"
+                                    "or bounce (e.g., easeinoutexpo).\n"
+                                    "And, direction - which only applies to push, slide,\n"
+                                    "and wipe - is one of: left (or fromright), right\n"
+                                    "(or fromleft), up (or fromdown), or down (fromtop).\n" },
 
         { "-m", "--mode", "M",      "Image stretch mode. Must be one of: original, stretch,\n"
                                     "fit, fill, hfill, or vfill.\n"  },
@@ -203,6 +254,7 @@ try
     if (args["--border"]) data.border = true;
     if (args["--topmost"]) data.topmost = true;
 
+    if (auto& arg = args["--tran"]) data.tran = arg.value<tran>();
     if (auto& arg = args["--mode"]) data.mode = arg.value<mode>().val;
 
     ////////////////////
