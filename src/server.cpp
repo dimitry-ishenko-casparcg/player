@@ -152,9 +152,9 @@ server::server(uv::loop& loop, const settings& data) :
     file.write(config.data(), config.size());
     file.close();
 
-    std::print("[server] starting CasparCG Server with:\n{}\n", config);
-
+    std::print("[server] starting CasparCG Server\n");
     proc_ = uv::process{loop, { data.server_path, config_path.string() }};
+
     proc_.on_exit([&](int status, int signal)
     {
         std::print("[server] CasparCG Server exited: status={} signal={}\n", status, signal);
@@ -166,9 +166,6 @@ server::server(uv::loop& loop, const settings& data) :
 void server::load_next(const entry& entry)
 {
     auto frames = [rate = framerate_](msec len) -> int { return len.count() / 1000. * rate + .5; };
-
-    auto path = entry.path.string();
-    std::print("[server] loading '{}'\n", path);
 
     auto cmd = "loadbg 1 \"" + entry.path.string() + "\"";
     if (entry.len) cmd.append(" length " + std::to_string(frames(*entry.len)));
