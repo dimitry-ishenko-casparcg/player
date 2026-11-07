@@ -1,5 +1,122 @@
-player (0.1) UNRELEASED; urgency=medium
+player (0.1) unstable; urgency=medium
 
-  * Initial release.
+  * Prepare for 0.1 release
+  * Add Debian release workflow
+  * Add Debian packaging
+  * uv::process: inherit stdout and stderr
+  * server: CasparCG Server output has all the data
+  * Install player.conf system-wide
+  * plugin: support custom name
+  * CMakeLists: enable custom name
+  * main: fix typos
+  * main: add --image-len option
+  * main: relax cadence match
+  * main: add --tran option
+  * main: tweak names
+  * type: fix size and rate types
+  * server: respect transition settings
+  * type: add transition bits into the entries
+  * server: refactor load_next()
+  * main: refactor parsing
+  * types: explicit initializer_list
+  * main: tweak the help screen
+  * main: don't force stretch mode
+  * main: move modes into types.hpp
+  * main: parse conf files
+  * server: center images
+  * Implement the --mode option
+  * server: fix load_next()
+  * server: apply settings
+  * main: tweak message
+  * main: switch to pgm::args 4.0
+  * types: refactor
+  * server: fix temp dir clean-up
+  * main: parse additional settings
+  * settings: add more settings
+  * main: refactor
+  * uv::udp: tweak
+  * uv::pipe: tweak
+  * screen: kill the server before removing the dir
+  * uv::timer: don't need default ctor anymore
+  * uv::process: make interface similar to std::thread and std::future
+  * uv::timer: guard against negative timeout
+  * uv::timer: add private ctor
+  * uv::process: tweak
+  * uv::pipe: tweak
+  * uv::timer: don't pollute global namespace
+  * uv::udp: tweak
+  * uv::process: don't spill running processes
+  * uv::handle: add is_active()
+  * Add uv::timer bits
+  * uv::address: tweak
+  * uv::pipe: tweak
+  * uv::process: tweak
+  * uv::udp: tweak
+  * Add GNOME and KDE plugins
+  * player: skip hidden files and dirs
+  * main: check that the path is a directory
+  * player: expect directory path
+  * player: tweak
+  * player: respect the loop option
+  * player: play media
+  * server: add started state
+  * server: rate_ => framerate_
+  * server: starting => none
+  * server: add load_next() function
+  * server: fps_ => rate_
+  * uv::process: connect stdin
+  * Add uv::pipe bits
+  * server: tweak
+  * uv::udp: tweak
+  * uv::signal: fix
+  * server: stop when screen consumer is closed
+  * server: report state changes
+  * server: add set_state() function
+  * server: read framerate
+  * server: tweak
+  * player: move entry into types
+  * settings.hpp => types.hpp
+  * server: use pid instead of random number
+  * server: better state names
+  * screen: fix
+  * player: implement basic loop
+  * server: report state changes
+  * server: add bits for osc dispatch
+  * server: simplify
+  * server: set cef cache dir
+  * server: tweak
+  * server: set up osc socket
+  * uv::udp:: add local() function
+  * uv::address: tweak
+  * Add uv::udp bits
+  * Add uv::address bits
+  * uv::signal: tweak
+  * uv::process: fix
+  * uv::handle: add const getter
+  * Add uv::signals bits
+  * signal: tweak
+  * server: fix config file
+  * player: store the settings
+  * uv::loop: add stop() function
+  * Add uv::signal bits
+  * Add bits for the server class
+  * uv::process: tweak
+  * uv::loop: tweak
+  * settings: add server_path
+  * process: add default ctor
+  * settings: path => media_path
+  * Add uv::process bits
+  * Add uv::handle bits
+  * Add uv::loop bits
+  * Add bits for uv::error
+  * player: scan path for supported media
+  * settings: add image display length
+  * Add bits for the settings and player classes
+  * Refactor
+  * main: add pgm::args bits
+  * README: update
+  * Add LICENSE.md
+  * Import project skeleton
+  * Initial commit
 
- -- Dimitry Ishenko <dimitry.ishenko@gmail.com>  Fri, 06 Nov 2026 22:52:18 -0500
+ -- Dimitry Ishenko <dimitry.ishenko@gmail.com>  Fri, 06 Nov 2026 23:31:19 -0500
