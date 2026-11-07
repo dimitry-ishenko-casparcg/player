@@ -55,9 +55,9 @@ struct entry
     std::optional<std::string> mode;
 };
 
-struct size { int width, height; };
+struct size { unsigned width, height; };
 struct pos  { int x, y; };
-struct rate { int num, den; };
+struct rate { unsigned num, den; };
 
 struct settings
 {
