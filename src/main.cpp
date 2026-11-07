@@ -175,9 +175,9 @@ try
                                     "Default: 10000.\n" },
 
         { "-n", "--tran", "N",      "Transition. Specified as <type>,<len>[,tween][,dir].\n"
-                                    "Type is be one of: cut, mix, push, slide, wipe,\n"
+                                    "Type is one of: cut, mix, push, slide, wipe,\n"
                                     "fadecut, cutfade, or vfade.\n"
-                                    "Length is a number of milliseconds.\n"
+                                    "Length is transition length in milliseconds.\n"
                                     "Tween is either linear or ease<X><Y>, with X being:\n"
                                     "in, out, inout, or outin; and Y being: quad, cubic,\n"
                                     "quart, quint, sine, expo, circ, elastic, back,\n"
