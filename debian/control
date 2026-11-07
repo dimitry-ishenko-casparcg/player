@@ -1,0 +1,21 @@
+Source: player
+Section: video
+Maintainer: Dimitry Ishenko <dimitry.ishenko@gmail.com>
+Build-Depends:
+ debhelper-compat (= 13),
+ cmake,
+ libosc++-dev,
+ libpgm-args-dev,
+ libuv1-dev,
+ pkgconf,
+Standards-Version: 4.7.4
+Vcs-Browser: https://github.com/dimitry-ishenko-casparcg/player
+Vcs-Git: https://github.com/dimitry-ishenko-casparcg/player.git
+
+Package: casparcg-player
+Architecture: any
+Depends:
+ ${shlibs:Depends},
+ ${misc:Depends},
+ casparcg-server (>= 2.5),
+Description: CasparCG Player
